@@ -9,12 +9,24 @@
             Provides custom JSON deserialization for objects marked with <see cref="T:DysonCore.PolymorphicJson.TypifyingPropertyAttribute"/>.
             </summary>
         </member>
+        <member name="M:DysonCore.PolymorphicJson.PolymorphicJsonConverter.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:DysonCore.PolymorphicJson.PolymorphicJsonConverter"/> class.
+            </summary>
+        </member>
         <member name="M:DysonCore.PolymorphicJson.PolymorphicJsonConverter.#ctor(System.Collections.Generic.List{System.Reflection.Assembly})">
             <summary>
             Initializes a new instance of the <see cref="T:DysonCore.PolymorphicJson.PolymorphicJsonConverter"/> class.
-            Optionally takes a list of assemblies to be used for initialization.
+            Takes a list of assemblies to be used for initialization.
             </summary>
-            <param name="assembliesToUse">List of assemblies to use for initialization, if any.</param>
+            <param name="assembliesToUse">List of assemblies to use for initialization.</param>
+        </member>
+        <member name="M:DysonCore.PolymorphicJson.PolymorphicJsonConverter.InitializeConverter(System.Collections.Generic.List{System.Reflection.Assembly})">
+            <summary>
+            Initializes the converter by scanning the assemblies for types with the <see cref="T:DysonCore.PolymorphicJson.TypifyingPropertyAttribute"/> 
+            and populates the BaseToPropertyData dictionary.
+            </summary>
+            <param name="assembliesToUse">List of assemblies to scan, if any. If null, the executing assembly and assemblies referencing current assembly are used.</param>
         </member>
         <member name="M:DysonCore.PolymorphicJson.PolymorphicJsonConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
             <summary>
