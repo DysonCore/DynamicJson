@@ -2,7 +2,7 @@
   "name": "com.dyson-core.polymorphic-json",
   "version": "1.0.0",
   "displayName": "Polymorphic Json",
-  "description": "Provides polymorphic JSON deserialization for objects marked with TypifyingProperty attribute",
+  "description": "Extension for Newtonsoft.Json.\nProvides polymorphic JSON deserialization for objects marked with TypifyingProperty attribute",
   "unity": "2019.1",
   "unityRelease": "0b5",
   "license": "See LICENSE.md file",
