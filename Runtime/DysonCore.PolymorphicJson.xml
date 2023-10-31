@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DysonCore.PolymorphicJson</name>
+    </assembly>
+    <members>
+        <member name="T:DysonCore.PolymorphicJson.PolymorphicJsonConverter">
+            <summary>
+            Provides custom JSON deserialization for objects marked with <see cref="T:DysonCore.PolymorphicJson.TypifyingPropertyAttribute"/>.
+            </summary>
+        </member>
+        <member name="M:DysonCore.PolymorphicJson.PolymorphicJsonConverter.#ctor(System.Collections.Generic.List{System.Reflection.Assembly})">
+            <summary>
+            Initializes a new instance of the <see cref="T:DysonCore.PolymorphicJson.PolymorphicJsonConverter"/> class.
+            Optionally takes a list of assemblies to be used for initialization.
+            </summary>
+            <param name="assembliesToUse">List of assemblies to use for initialization, if any.</param>
+        </member>
+        <member name="M:DysonCore.PolymorphicJson.PolymorphicJsonConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            Deserializes a JSON object based on the defined typifying property.
+            </summary>
+            <returns>The deserialized object.</returns>
+        </member>
+        <member name="M:DysonCore.PolymorphicJson.PolymorphicJsonConverter.CanConvert(System.Type)">
+            <summary>
+            Determines if the given type can be converted using this converter.
+            </summary>
+            <param name="objectType">Type of the object to check.</param>
+            <returns>True if the type can be converted; otherwise, false.</returns>
+        </member>
+        <member name="M:DysonCore.PolymorphicJson.PolymorphicJsonConverter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <inheritdoc />
+        </member>
+        <member name="P:DysonCore.PolymorphicJson.PolymorphicJsonConverter.CanWrite">
+            <inheritdoc />
+        </member>
+        <member name="T:DysonCore.PolymorphicJson.TypifyingPropertyAttribute">
+            <summary>
+            Marks property for polymorphic deserialization as a qualifier.
+            Should be used on property declaration and value assignment. 
+            </summary>
+        </member>
+    </members>
+</doc>
