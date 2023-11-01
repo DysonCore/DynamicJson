@@ -1,4 +1,4 @@
-# PolymorphicJson - An Extension for Newtonsoft.Json
+# _PolymorphicJson_ - An Extension for Newtonsoft.Json
 **PolymorphicJson** is a UPM package that enhances the capabilities of `newtonsoft.json` by providing a straightforward, intuitive, and generalized deserialization flow for complex polymorphism. 
 
 ## Installation 
@@ -137,7 +137,7 @@ In this example:
 -	`Mammal`, an `abstract` derived class, assigns the value `"Mammal"` to the `AnimalType` and introduces its own qualifier `MammalType`.
 -	Concrete classes `Dog` and `Cat` further override `MammalType` qualifier to provide specific values.
 
-When deserializing a list of `Animal`, PolymorphicJson will inspect the qualifiers and correctly instantiate `Dog` and `Cat` objects based on the provided JSON, even with such nested hierarchies.
+When deserializing a list of `Animal`, **PolymorphicJson** will inspect the qualifiers and correctly instantiate `Dog` and `Cat` objects based on the provided JSON, even with such nested hierarchies.
 
 ### Qualifying Properties
 
@@ -147,7 +147,7 @@ When deserializing a list of `Animal`, PolymorphicJson will inspect the qualifie
 
 ## Initialization and Performance
 
-`PolymorphicJsonConverter` requires knowledge of potential derived types for accurate deserialization. **By default**, the converter will scan assemblies which are referencing the `PolymorphicJson` assembly. However, for enhanced initialization performance, You can specify assemblies in constructor:
+`PolymorphicJsonConverter` requires knowledge of potential derived types for accurate deserialization. **By default**, the converter will scan assemblies which are referencing the **PolymorphicJson** assembly. However, for enhanced initialization performance, You can specify assemblies in constructor:
 ```csharp
 var converter = new PolymorphicJsonConverter(new [] { typeof(YourClass).Assembly });
 // Note: creation of new PolymorphicJsonConverter instance will re-write converters static cache. 
