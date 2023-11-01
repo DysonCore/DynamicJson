@@ -88,7 +88,7 @@ List<Reward> deserializedRewards = JsonConvert.DeserializeObject<List<Reward>>(r
 // Note: The above has been tested with the [JsonConverter(typeof(PolymorphicJsonConverter))] attribute applied to the Reward class.
 }
 ```
-Despite using the abstract `Reward` class for deserialization, the `deserializedRewards` list will correctly contain instances of the concrete `CurrencyReward` and `BadgeReward` classes.
+Despite using the `abstract` `Reward` class for deserialization, the `deserializedRewards` list will correctly contain instances of the concrete `CurrencyReward` and `BadgeReward` classes.
 
 ### Complex Inheritance
 
