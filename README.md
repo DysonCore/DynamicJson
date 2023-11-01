@@ -141,7 +141,7 @@ When deserializing a list of `Animal`, PolymorphicJson will inspect the qualifie
 
 ### Qualifying Properties
 
-**PolymorphicJson** allows a great deal of flexibility when choosing qualifying properties. Both `value types` and `reference types` that implement the IEquatable interface are valid. This offers a vast array of possibilities in defining polymorphic relationships.
+**PolymorphicJson** allows a great deal of flexibility when choosing qualifying properties. Both `value types` and `reference types` that implement the `IEquatable<T>` interface are valid. This offers a vast array of possibilities in defining polymorphic relationships.
 
 **\*Tip\*:** the most concise and convenient type for qualifying property is `enum` in combination with `StringEnumConverter`. 
 
