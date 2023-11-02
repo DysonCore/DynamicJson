@@ -7,7 +7,7 @@
   "unityRelease": "0b5",
   "license": "See LICENSE.md file",
   "dependencies": {
-    "com.unity.nuget.newtonsoft-json": ""
+    "com.unity.nuget.newtonsoft-json": ">=2.0.0"
   },
   "testables": 
     ["com.dyson-core.polymorphic-json"],
