@@ -1,5 +1,5 @@
 {
-  "name": "com.dyson-core.polymorphic-json",
+  "name": "com.dysoncore.polymorphic-json",
   "version": "1.0.0",
   "displayName": "Polymorphic Json",
   "description": "Extension for Newtonsoft.Json.\nProvides polymorphic JSON deserialization for objects marked with TypifyingProperty attribute",
@@ -10,7 +10,7 @@
     "com.unity.nuget.newtonsoft-json": "2.0.0"
   },
   "testables": 
-    ["com.dyson-core.polymorphic-json"],
+    ["com.dysoncore.polymorphic-json"],
   "keywords": [
     "Json",
     "Parsing",

@@ -3,7 +3,8 @@
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner"
+        "UnityEditor.TestRunner",
+        "DysonCore.PolymorphicJson"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -11,7 +12,6 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "nunit.framework.dll",
-        "DysonCore.PolymorphicJson.dll",
         "Newtonsoft.Json.dll"
     ],
     "autoReferenced": false,

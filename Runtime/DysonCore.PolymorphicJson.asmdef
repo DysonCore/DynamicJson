@@ -1,0 +1,16 @@
+{
+    "name": "DysonCore.PolymorphicJson",
+    "rootNamespace": "DysonCore.PolymorphicJson",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Newtonsoft.Json.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}
