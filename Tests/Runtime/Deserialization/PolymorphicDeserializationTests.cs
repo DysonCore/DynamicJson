@@ -79,8 +79,35 @@ namespace Tests.Runtime.Deserialization
             }
         }
         
+        [Test]
+        public void DeserializeComposition_CompletesSuccessfully()
+        {
+            List<RewardWrapper> wrappers = new List<RewardWrapper>
+            {
+                new RewardWrapper{Reward = new CoinReward()},
+                new RewardWrapper{Reward = new GoldReward()},
+                new RewardWrapper{Reward = new NewbieBadge()},
+                new RewardWrapper{Reward = new WarriorBadge()},
+                new RewardWrapper{Reward = new MageBadge()},
+                new RewardWrapper{Reward = new LimitedEditionReward()},
+                new RewardWrapper{Reward = new RegularEditionReward()}
+            };
+
+            string rewardsJson = JsonConvert.SerializeObject(wrappers, _settings);
+            List<RewardWrapper> deserializedWrappers = JsonConvert.DeserializeObject<List<RewardWrapper>>(rewardsJson, _settings);
+            
+            for (int i = 0; i < wrappers.Count; i++)
+            {
+                Assert.IsInstanceOf(wrappers[i].Reward.GetType(), deserializedWrappers[i].Reward);
+            }
+        }
+        
         #region TestModels
 
+        private class RewardWrapper
+        {
+            public Reward Reward { get; set; }
+        }
         
         private abstract class Reward
         {
