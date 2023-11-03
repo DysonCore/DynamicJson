@@ -31,14 +31,14 @@ namespace DysonCore.PolymorphicJson
         /// Takes a list of assemblies to be used for initialization.
         /// </summary>
         /// <param name="assembliesToUse">List of assemblies to use for initialization.</param>
-        public PolymorphicJsonConverter(List<Assembly> assembliesToUse)
+        public PolymorphicJsonConverter(params Assembly[] assembliesToUse)
         {
             Init(assembliesToUse);
         }
 
-        private void Init(List<Assembly> assembliesToUse = null)
+        private void Init(params Assembly[] assembliesToUse)
         {
-            if (assembliesToUse is { Count: > 0 })
+            if (assembliesToUse is { Length: > 0 })
             {
                 BaseToPropertyData.Clear();
                 InitializeConverter(assembliesToUse);
@@ -59,10 +59,10 @@ namespace DysonCore.PolymorphicJson
         /// and populates the BaseToPropertyData dictionary.
         /// </summary>
         /// <param name="assembliesToUse">List of assemblies to scan, if any. If null, the executing assembly and assemblies referencing current assembly are used.</param>
-        private static void InitializeConverter(List<Assembly> assembliesToUse = null)
+        private static void InitializeConverter(params Assembly[] assembliesToUse)
         {
             List<(Type abstractType, PropertyData propertyData)> abstractDefiningData = new ();
-            List<Assembly> assemblies = assembliesToUse ?? Assembly.GetExecutingAssembly().GetReferencingAssemblies();
+            Assembly[] assemblies = assembliesToUse ?? Assembly.GetExecutingAssembly().GetReferencingAssemblies();
             
             foreach (Assembly assembly in assemblies)
             {

@@ -15,13 +15,13 @@ namespace DysonCore.PolymorphicJson
         /// </summary>
         /// <param name="currentAssembly">The assembly to check references for.</param>
         /// <returns>A list of assemblies that reference the provided assembly.</returns>
-        internal static List<Assembly> GetReferencingAssemblies(this Assembly currentAssembly)
+        internal static Assembly[] GetReferencingAssemblies(this Assembly currentAssembly)
         {
             Assembly[] loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
             
             return loadedAssemblies
                 .Where(assembly => assembly.IsReferencing(currentAssembly))
-                .ToList();
+                .ToArray();
         }
 
         /// <summary>
