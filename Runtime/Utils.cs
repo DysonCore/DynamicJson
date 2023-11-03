@@ -39,7 +39,7 @@ namespace DysonCore.PolymorphicJson
         }
         
         /// <summary>
-        /// Retrieves the lowest type within an inheritance chain that defines a specific property.
+        /// Retrieves the lowest type within an inheritance chain which declares a specific property.
         /// </summary>
         /// <param name="currentType">The starting type from which the search begins.</param>
         /// <param name="propertyName">The name of the property to search for in the inheritance chain.</param>
@@ -50,11 +50,11 @@ namespace DysonCore.PolymorphicJson
         /// It aims to find the "lowest" or most derived type that defines the property. If two types in the inheritance chain have
         /// a property with the same name, the method will return the more derived type. 
         /// </remarks>
-        internal static Type GetDefiningType(this Type currentType, string propertyName)
+        internal static Type GetDeclaringClass(this Type currentType, string propertyName)
         {
             if (currentType == null)
             {
-                throw new ArgumentNullException($"[{nameof(Utils)}.{nameof(GetDefiningType)}] {nameof(currentType)} is null. {nameof(propertyName)} - {propertyName}");
+                throw new ArgumentNullException($"[{nameof(Utils)}.{nameof(GetDeclaringClass)}] {nameof(currentType)} is null. {nameof(propertyName)} - {propertyName}");
             }
             
             Type definingType = currentType;

@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 namespace Tests.Runtime.Deserialization
 {
-    public class PolymorphicDeserializationTests 
+    public class BasicTests 
     {
         private JsonSerializerSettings _settings;
     
@@ -21,7 +21,7 @@ namespace Tests.Runtime.Deserialization
         }
     
         [Test]
-        public void DeserializeClassesSeparately_CompletesSuccessfully()
+        public void DeserializeClasses_CompletesSuccessfully()
         {
             CoinReward coin = new CoinReward();
             GoldReward gold = new GoldReward();

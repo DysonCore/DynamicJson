@@ -61,13 +61,8 @@ namespace DysonCore.PolymorphicJson
         /// <param name="assembliesToUse">List of assemblies to scan, if any. If null, the executing assembly and assemblies referencing current assembly are used.</param>
         private static void InitializeConverter(List<Assembly> assembliesToUse = null)
         {
-            Type attributeType = typeof(TypifyingPropertyAttribute);
-            Assembly currentAssembly = Assembly.GetExecutingAssembly();
-            
-            List<(Type abstractType, PropertyData propertyData)> abstractDefiningData = new();
-            List<Assembly> assemblies = assembliesToUse ?? currentAssembly.GetReferencingAssemblies();
-            
-            assemblies.Add(currentAssembly);
+            List<(Type abstractType, PropertyData propertyData)> abstractDefiningData = new ();
+            List<Assembly> assemblies = assembliesToUse ?? Assembly.GetExecutingAssembly().GetReferencingAssemblies();
             
             foreach (Assembly assembly in assemblies)
             {
@@ -75,7 +70,9 @@ namespace DysonCore.PolymorphicJson
                 {
                     foreach (PropertyInfo propertyInfo in classType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
                     {
-                        if (propertyInfo.GetCustomAttributes(attributeType, false).Length <= 0)
+                        TypifyingPropertyAttribute typifyingAttribute = propertyInfo.GetCustomAttribute<TypifyingPropertyAttribute>();
+                        
+                        if (typifyingAttribute == null)
                         {
                             continue;
                         }
@@ -83,7 +80,7 @@ namespace DysonCore.PolymorphicJson
                         Type propertyType = propertyInfo.PropertyType;
                         JsonPropertyAttribute jsonProperty = propertyInfo.GetCustomAttribute<JsonPropertyAttribute>();
 
-                        Type baseClass = classType.GetDefiningType(propertyInfo.Name);
+                        Type baseClass = classType.GetDeclaringClass(propertyInfo.Name);
                         
                         if (!BaseToPropertyData.TryGetValue(baseClass, out PropertyData propertyData))
                         {
@@ -108,7 +105,7 @@ namespace DysonCore.PolymorphicJson
                 }
             }
             
-            foreach ((Type abstractType, PropertyData propertyData) data in abstractDefiningData)
+            foreach (var data in abstractDefiningData)
             {
                 if(!BaseToPropertyData.TryGetValue(data.abstractType, out PropertyData propertyData))
                 {
