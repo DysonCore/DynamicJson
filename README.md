@@ -14,8 +14,6 @@ To add this package to your Unity project:
 
 For a detailed guide, refer to [Unity How to Install a package from a Git URL](https://docs.unity3d.com/Manual/upm-ui-giturl.html)
 
-**Alternatively** You can place the `DysonCore.PolymorphicJson.dll` file into **\*\*Your_Unity_Project\*\*/Assets/Plugins** directory.
-
 ### Dependencies
 
 This package requires the **Newtonsoft.Json** library to be installed. 
