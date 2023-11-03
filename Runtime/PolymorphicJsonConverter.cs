@@ -17,28 +17,15 @@ namespace DysonCore.PolymorphicJson
 
         private JsonSerializer _defaultSerializer;
         private JsonSerializer GetDefaultSerializer(JsonSerializer serializer) => _defaultSerializer ??= CreateDefaultSerializer(serializer);
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PolymorphicJsonConverter"/> class.
-        /// </summary>
-        public PolymorphicJsonConverter()
-        {
-            Init();
-        }
         
         /// <summary>
         /// Initializes a new instance of the <see cref="PolymorphicJsonConverter"/> class.
-        /// Takes a list of assemblies to be used for initialization.
+        /// Optionally takes an array of assemblies to be used for initialization.
         /// </summary>
-        /// <param name="assembliesToUse">List of assemblies to use for initialization.</param>
+        /// <param name="assembliesToUse">Optional array of assemblies to use for initialization.</param>
         public PolymorphicJsonConverter(params Assembly[] assembliesToUse)
         {
-            Init(assembliesToUse);
-        }
-
-        private void Init(params Assembly[] assembliesToUse)
-        {
-            if (assembliesToUse is { Length: > 0 })
+            if (assembliesToUse.Length > 0)
             {
                 BaseToPropertyData.Clear();
                 InitializeConverter(assembliesToUse);
@@ -62,7 +49,7 @@ namespace DysonCore.PolymorphicJson
         private static void InitializeConverter(params Assembly[] assembliesToUse)
         {
             List<(Type abstractType, PropertyData propertyData)> abstractDefiningData = new ();
-            Assembly[] assemblies = assembliesToUse ?? Assembly.GetExecutingAssembly().GetReferencingAssemblies();
+            Assembly[] assemblies = assembliesToUse.Length > 0 ? assembliesToUse : Assembly.GetExecutingAssembly().GetReferencingAssemblies();
             
             foreach (Assembly assembly in assemblies)
             {
