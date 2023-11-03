@@ -136,7 +136,7 @@ public class Cat : Mammal
 
 In this example:
 
--	`Animal` is the top-level base class with a qualifying attribute `AnimalType`.
+-   `Animal` is the top-level base class with a qualifying attribute `AnimalType`.
 -	`Mammal`, an `abstract` derived class, assigns the value `"Mammal"` to the `AnimalType` and introduces its own qualifier `MammalType`.
 -	Concrete classes `Dog` and `Cat` further override `MammalType` qualifier to provide specific values.
 
@@ -156,6 +156,9 @@ var converter = new PolymorphicJsonConverter(new [] { typeof(YourClass).Assembly
 // Note: creation of new PolymorphicJsonConverter instance will re-write converters static cache. 
 ```
 Specifying assemblies directly can reduce the initialization time and garbage generation.
+
+## Known limitations
+-   Can not be used with the interface as an inheritance root! 
 
 ## Feedback and Contributions
 
