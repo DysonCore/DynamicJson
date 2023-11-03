@@ -1,4 +1,7 @@
 # _PolymorphicJson_ - An Extension for Newtonsoft.Json
+
+![PolymorphicJson logo](https://github.com/DysonCore/PolymorphicJson/assets/39878275/44bc4a94-f9be-44c2-be59-28facebb7a7d)
+
 **PolymorphicJson** is a UPM package that enhances the capabilities of `newtonsoft.json` by providing a straightforward, intuitive, and generalized deserialization flow for complex polymorphism. 
 
 ## Installation 
