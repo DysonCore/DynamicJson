@@ -1,4 +1,5 @@
 using System;
+using DysonCore.PolymorphicJson.Enums;
 
 namespace DysonCore.PolymorphicJson
 {
@@ -9,6 +10,11 @@ namespace DysonCore.PolymorphicJson
     [AttributeUsage(AttributeTargets.Property, Inherited = false)]
     public sealed class TypifyingPropertyAttribute : Attribute
     {
-        
+        public UnknownTypeHandling UnknownTypeHandling { get; }
+
+        public TypifyingPropertyAttribute(UnknownTypeHandling unknownTypeHandling = UnknownTypeHandling.ThrowError)
+        {
+            UnknownTypeHandling = unknownTypeHandling;
+        }
     }
 }

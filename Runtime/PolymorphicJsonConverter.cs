@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using DysonCore.PolymorphicJson.Enums;
+using DysonCore.PolymorphicJson.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -71,7 +73,7 @@ namespace DysonCore.PolymorphicJson
                         
                         if (!BaseToPropertyData.TryGetValue(baseClass, out PropertyData propertyData))
                         {
-                            propertyData = new PropertyData(propertyType, propertyInfo.Name, jsonProperty?.PropertyName);
+                            propertyData = new PropertyData(propertyType, propertyInfo.Name, jsonProperty?.PropertyName, baseClass.GetProperty(propertyInfo.Name)?.GetCustomAttribute<TypifyingPropertyAttribute>());
                             BaseToPropertyData[baseClass] = propertyData;
                         }
                         
@@ -128,17 +130,16 @@ namespace DysonCore.PolymorphicJson
             }
             
             JToken typeToken = token.SelectToken(propertyData.JsonName);
-            
-            if (typeToken is null)
-            {
-                throw new JsonSerializationException($"[{nameof(PolymorphicJsonConverter)}.{nameof(ReadJson)}] Can't find typified json token for type {objectType.FullName}. Used property name {propertyData.JsonName}.\nJObject - {token}");
-            }
-            
-            object value = typeToken.ToObject(propertyData.PropertyType);
+            object value = typeToken?.ToObject(propertyData.PropertyType);
 
             if (value is null || !propertyData.ValuesData.TryGetValue(value, out Type implementer))
             {
-                throw new JsonSerializationException($"[{nameof(PolymorphicJsonConverter)}.{nameof(ReadJson)}] Can't parse typifying token or find concrete class. Typifying token - {typeToken}. Object type - {objectType.FullName}. Used type - {propertyData.PropertyType.FullName}");
+                switch (propertyData.TypifyingAttribute.UnknownTypeHandling)
+                {
+                    case UnknownTypeHandling.ReturnNull: return null;
+                    case UnknownTypeHandling.ThrowError:
+                    default: throw new JsonSerializationException($"[{nameof(PolymorphicJsonConverter)}.{nameof(ReadJson)}] Can't parse typifying token or find concrete class. Typifying token - {typeToken}. Object type - {objectType.FullName}. Used type - {propertyData.PropertyType.FullName}");
+                }
             }
 
             JsonSerializer jsonSerializer = objectType.IsAbstract ? serializer : GetDefaultSerializer(serializer);

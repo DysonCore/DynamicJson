@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using DysonCore.PolymorphicJson;
+using DysonCore.PolymorphicJson.Enums;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -102,6 +103,36 @@ namespace Tests.Runtime.Deserialization
             }
         }
         
+        //[{"badgeNumber":101,"RewardType":"badge"},{"badgeNumber":102,"RewardType":"badge"},{"RewardType":"badge","badgeNumber":100}]
+        
+        [Test]
+        public void DeserializeWrongType_NullValueHandling_ReturnNull_CompletesSuccessfully()
+        {
+            string rewardsJson = "[{\"badgeNumber\":105,\"RewardType\":\"badge\"},{\"badgeNumber\":106,\"RewardType\":\"badge\"},{\"RewardType\":\"badge\",\"badgeNumber\":107}]";
+            Assert.DoesNotThrow(() =>
+            {
+                List<Reward> deserializedRewards = JsonConvert.DeserializeObject<List<Reward>>(rewardsJson, _settings);
+                foreach (var reward in deserializedRewards)
+                {
+                    Assert.IsNull(reward);
+                }
+            });
+        }
+        
+        [Test]
+        public void DeserializeWrongTypeComposition_NullValueHandling_ReturnNull_CompletesSuccessfully()
+        {
+            string rewardsJson = "[{\"Reward\":{\"badgeNumber\":105,\"RewardType\":\"badge\"}}]";
+            Assert.DoesNotThrow(() =>
+            {
+                List<RewardWrapper> deserializedRewards = JsonConvert.DeserializeObject<List<RewardWrapper>>(rewardsJson, _settings);
+                foreach (var rewardWrapper in deserializedRewards)
+                {
+                    Assert.IsNull(rewardWrapper.Reward);
+                }
+            });
+        }
+        
         #region TestModels
 
         private class RewardWrapper
@@ -137,7 +168,7 @@ namespace Tests.Runtime.Deserialization
         {
             [TypifyingProperty] public sealed override RewardType RewardType => RewardType.Badge;
 
-            [TypifyingProperty]
+            [TypifyingProperty(UnknownTypeHandling.ReturnNull)]
             [JsonProperty("badgeNumber")]
             public virtual int BadgeId => 100;
         }

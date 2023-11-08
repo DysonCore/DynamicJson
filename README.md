@@ -146,11 +146,27 @@ When deserializing a list of `Animal`, **PolymorphicJson** will inspect the qual
 
 **\*Tip\*:** the most concise and convenient type for qualifying property is `enum` in combination with `StringEnumConverter`. 
 
+### Unknown Value Handling
+When `TypifyingPropertyAttribute` encounters unknown value in qualifying property - it has 2 ways to handle it:
+
+- `UnknownTypeHandling.ThrowError` - Throws `JsonSerializationException`. 
+- `UnknownTypeHandling.ReturnNull` - Returns null for an object.
+
+By default `UnknownTypeHandling.ThrowError` is used. To specify otherwise, pass `UnknownTypeHandling` `enum` as a parameter in `TypifyingPropertyAttribute` constructor in the base class.  
+
+```csharp
+public abstract class Animal
+{
+    [TypifyingProperty(UnknownTypeHandling.ReturnNull)]
+    public abstract string AnimalType { get; }
+}
+```
+
 ## Initialization and Performance
 
-`PolymorphicJsonConverter` requires knowledge of potential derived types for accurate deserialization. **By default**, the converter will scan assemblies which are referencing the **PolymorphicJson** assembly. However, for enhanced initialization performance, You can specify assemblies in constructor:
+`PolymorphicJsonConverter` requires knowledge of potential derived types for accurate deserialization. **By default**, the converter will scan assemblies which are referencing the **PolymorphicJson** assembly. However, for enhanced initialization performance, You can specify assemblies in constructor (single or array):
 ```csharp
-var converter = new PolymorphicJsonConverter(new [] { typeof(YourClass).Assembly });
+var converter = new PolymorphicJsonConverter(Assembly.GetExecutingAssembly());
 // Note: creation of new PolymorphicJsonConverter instance will re-write converters static cache. 
 ```
 Specifying assemblies directly can reduce the initialization time and garbage generation.

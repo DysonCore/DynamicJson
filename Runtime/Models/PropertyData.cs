@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace DysonCore.PolymorphicJson
+namespace DysonCore.PolymorphicJson.Models
 {
     /// <summary>
     /// Represents metadata for properties marked with the <see cref="TypifyingPropertyAttribute"/>. 
@@ -13,13 +13,15 @@ namespace DysonCore.PolymorphicJson
         public string PropertyName { get; }
         public string JsonName { get; }
         public Dictionary<object, Type> ValuesData { get; }
+        public TypifyingPropertyAttribute TypifyingAttribute { get; }
 
-        internal PropertyData(Type propertyType, string propertyName, string jsonName)
+        internal PropertyData(Type propertyType, string propertyName, string jsonName, TypifyingPropertyAttribute baseTypifyingAttribute)
         {
             PropertyType = propertyType;
             PropertyName = propertyName;
             JsonName = string.IsNullOrWhiteSpace(jsonName) ? propertyName : jsonName;
             ValuesData = new Dictionary<object, Type>();
+            TypifyingAttribute = baseTypifyingAttribute;
         }
     }
 }
