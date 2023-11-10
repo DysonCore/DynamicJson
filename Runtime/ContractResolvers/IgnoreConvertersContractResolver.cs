@@ -3,7 +3,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace DysonCore.PolymorphicJson
+namespace DysonCore.PolymorphicJson.ContractResolvers
 {
     internal sealed class IgnoreConvertersContractResolver : DefaultContractResolver
     {

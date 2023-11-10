@@ -1,5 +1,6 @@
 using System.Collections.Generic;
-using DysonCore.PolymorphicJson;
+using DysonCore.PolymorphicJson.Attributes;
+using DysonCore.PolymorphicJson.Converters;
 using DysonCore.PolymorphicJson.Enums;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -133,7 +134,26 @@ namespace Tests.Runtime.Deserialization
             });
         }
         
-        #region TestModels
+        [Test]
+        public void DeserializeListOfInterfaces_CompletesSuccessfully()
+        {
+            List<IAnimal> animals = new List<IAnimal>
+            {
+                new Mammal(),
+                new Bird(),
+                new Fish()
+            };
+
+            string animalJson = JsonConvert.SerializeObject(animals, _settings);
+            List<IAnimal> deserializedAnimals = JsonConvert.DeserializeObject<List<IAnimal>>(animalJson, _settings);
+
+            for (int i = 0; i < animals.Count; i++)
+            {
+                Assert.IsInstanceOf(animals[i].GetType(), deserializedAnimals[i]);
+            }
+        }
+        
+        #region TestModels_Reward
 
         private class RewardWrapper
         {
@@ -206,6 +226,42 @@ namespace Tests.Runtime.Deserialization
             Special
         }
 
+        #endregion
+        
+        #region TestModels_Animal
+
+        private interface IAnimal
+        {
+            [TypifyingProperty]
+            [JsonProperty("type")]
+            AnimalType AnimalType { get; }
+        }
+        
+        private class Mammal : IAnimal
+        {
+            [TypifyingProperty(typeof(IAnimal))]
+            public AnimalType AnimalType => AnimalType.Mammal;
+        }
+        
+        private class Bird : IAnimal
+        {
+            [TypifyingProperty(typeof(IAnimal))]
+            public AnimalType AnimalType => AnimalType.Bird;
+        }
+
+        private class Fish : IAnimal
+        {
+            [TypifyingProperty(typeof(IAnimal))]
+            public AnimalType AnimalType => AnimalType.Fish;
+        }
+
+        private enum AnimalType
+        {
+            Mammal,
+            Bird,
+            Fish
+        }
+        
         #endregion
 
     }

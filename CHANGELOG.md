@@ -1,3 +1,6 @@
+## [1.0.3] - 2023-11-10
+### Added support of interfaces as a base class
+
 ## [1.0.2] - 2023-11-08
 ### Unknown Value Handling added.
 

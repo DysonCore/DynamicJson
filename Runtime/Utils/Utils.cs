@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace DysonCore.PolymorphicJson
+namespace DysonCore.PolymorphicJson.Utils
 {
     /// <summary>
     /// Provides utility methods to support typified JSON functionalities.

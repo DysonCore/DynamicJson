@@ -146,6 +146,26 @@ When deserializing a list of `Animal`, **PolymorphicJson** will inspect the qual
 
 **\*Tip\*:** the most concise and convenient type for qualifying property is `enum` in combination with `StringEnumConverter`. 
 
+### Interface as Inheritance Root 
+
+**PolymorphicJson** can't automatically find references between interface and derived classes. So if You are using interface as an inheritance root, You need to explicitly specify the interface type like so:
+
+```csharp
+public interface IAnimal
+{
+    [TypifyingProperty]
+    AnimalType AnimalType { get; }
+}
+```
+
+```csharp       
+public class Mammal : IAnimal
+{
+    [TypifyingProperty(typeof(IAnimal))]
+    public AnimalType AnimalType => AnimalType.Mammal;
+}
+```
+
 ### Unknown Value Handling
 When `TypifyingPropertyAttribute` encounters unknown value in qualifying property - it has 2 ways to handle it:
 
@@ -172,7 +192,7 @@ var converter = new PolymorphicJsonConverter(Assembly.GetExecutingAssembly());
 Specifying assemblies directly can reduce the initialization time and garbage generation.
 
 ## Known limitations
--   Can not be used with the interface as an inheritance root! 
+-   Plain `[TypifyingProperty]` can not be used with the interface as an inheritance root! `[TypifyingProperty(typeof(Interface))]` should be used in derived classes instead.
 
 ## Feedback and Contributions
 

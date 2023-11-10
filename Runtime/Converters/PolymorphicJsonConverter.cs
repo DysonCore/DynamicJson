@@ -2,12 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using DysonCore.PolymorphicJson.Attributes;
+using DysonCore.PolymorphicJson.ContractResolvers;
 using DysonCore.PolymorphicJson.Enums;
 using DysonCore.PolymorphicJson.Models;
+using DysonCore.PolymorphicJson.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace DysonCore.PolymorphicJson
+namespace DysonCore.PolymorphicJson.Converters
 {
     /// <summary>
     /// Provides custom JSON deserialization for objects marked with <see cref="TypifyingPropertyAttribute"/>.
@@ -69,11 +72,17 @@ namespace DysonCore.PolymorphicJson
                         Type propertyType = propertyInfo.PropertyType;
                         JsonPropertyAttribute jsonProperty = propertyInfo.GetCustomAttribute<JsonPropertyAttribute>();
 
-                        Type baseClass = classType.GetDeclaringClass(propertyInfo.Name);
+                        Type baseClass = typifyingAttribute.InheritanceRoot ?? classType.GetDeclaringClass(propertyInfo.Name);
+                        TypifyingPropertyAttribute baseAttribute = baseClass.GetProperty(propertyInfo.Name)?.GetCustomAttribute<TypifyingPropertyAttribute>();
+
+                        if (baseAttribute == null)
+                        {
+                            throw new Exception($"[{nameof(PolymorphicJsonConverter)}.{nameof(InitializeConverter)}] {baseClass.Name} has no property with {nameof(TypifyingPropertyAttribute)} and \"{propertyInfo.Name}\" {nameof(propertyInfo.Name)}.\nReferencing class - {classType.FullName}.");
+                        }
                         
                         if (!BaseToPropertyData.TryGetValue(baseClass, out PropertyData propertyData))
                         {
-                            propertyData = new PropertyData(propertyType, propertyInfo.Name, jsonProperty?.PropertyName, baseClass.GetProperty(propertyInfo.Name)?.GetCustomAttribute<TypifyingPropertyAttribute>());
+                            propertyData = new PropertyData(propertyType, propertyInfo.Name, jsonProperty?.PropertyName, baseAttribute);
                             BaseToPropertyData[baseClass] = propertyData;
                         }
                         
@@ -138,7 +147,7 @@ namespace DysonCore.PolymorphicJson
                 {
                     case UnknownTypeHandling.ReturnNull: return null;
                     case UnknownTypeHandling.ThrowError:
-                    default: throw new JsonSerializationException($"[{nameof(PolymorphicJsonConverter)}.{nameof(ReadJson)}] Can't parse typifying token or find concrete class. Typifying token - {typeToken}. Object type - {objectType.FullName}. Used type - {propertyData.PropertyType.FullName}");
+                    default: throw new JsonReaderException($"[{nameof(PolymorphicJsonConverter)}.{nameof(ReadJson)}] Can't parse typifying token or find concrete class. Typifying token - {typeToken}. Object type - {objectType.FullName}. Used type - {propertyData.PropertyType.FullName}");
                 }
             }
 
