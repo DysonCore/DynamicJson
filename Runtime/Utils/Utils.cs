@@ -6,7 +6,7 @@ using System.Reflection;
 namespace DysonCore.PolymorphicJson.Utils
 {
     /// <summary>
-    /// Provides utility methods to support typified JSON functionalities.
+    /// Provides internal utility methods to Polymorphic JSON package.
     /// </summary>
     internal static class Utils
     {
@@ -58,7 +58,6 @@ namespace DysonCore.PolymorphicJson.Utils
             }
             
             Type definingType = currentType;
-            
             Type baseType = currentType.BaseType;
 
             while (baseType != null)

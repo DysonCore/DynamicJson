@@ -9,7 +9,7 @@ using NUnit.Framework;
 
 namespace Tests.Runtime.Deserialization
 {
-    public class BasicTests 
+    public class TypifyingPropertyTests 
     {
         private JsonSerializerSettings _settings;
     
@@ -48,6 +48,14 @@ namespace Tests.Runtime.Deserialization
             Reward warriorBadgeReward = JsonConvert.DeserializeObject<Reward>(warriorBadgeJson, _settings);
             Reward mageBadgeReward = JsonConvert.DeserializeObject<Reward>(mageBadgeJson, _settings);
             Reward newbieBadgeReward = JsonConvert.DeserializeObject<Reward>(newbieBadgeJson, _settings);
+            
+            Assert.IsNotNull(coinReward);
+            Assert.IsNotNull(goldReward);
+            Assert.IsNotNull(limitedEditionReward);
+            Assert.IsNotNull(regularEditionReward);
+            Assert.IsNotNull(warriorBadgeReward);
+            Assert.IsNotNull(mageBadgeReward);
+            Assert.IsNotNull(newbieBadgeReward);
             
             Assert.IsInstanceOf<CoinReward>(coinReward);
             Assert.IsInstanceOf<GoldReward>(goldReward);
@@ -103,8 +111,6 @@ namespace Tests.Runtime.Deserialization
                 Assert.IsInstanceOf(wrappers[i].Reward.GetType(), deserializedWrappers[i].Reward);
             }
         }
-        
-        //[{"badgeNumber":101,"RewardType":"badge"},{"badgeNumber":102,"RewardType":"badge"},{"RewardType":"badge","badgeNumber":100}]
         
         [Test]
         public void DeserializeWrongType_NullValueHandling_ReturnNull_CompletesSuccessfully()

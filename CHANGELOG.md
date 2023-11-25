@@ -1,3 +1,6 @@
+## [1.1.0] - 2023-11-25
+### Polymorphism for composite classes
+
 ## [1.0.3] - 2023-11-10
 ### Added support of interfaces as a base class
 

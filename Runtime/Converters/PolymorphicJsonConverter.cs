@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using DysonCore.PolymorphicJson.Attributes;
-using DysonCore.PolymorphicJson.ContractResolvers;
 using DysonCore.PolymorphicJson.Enums;
 using DysonCore.PolymorphicJson.Models;
-using DysonCore.PolymorphicJson.Utils;
+using DysonCore.PolymorphicJson.Providers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -17,11 +15,8 @@ namespace DysonCore.PolymorphicJson.Converters
     /// </summary>
     public sealed class PolymorphicJsonConverter: JsonConverter
     {
-        private static readonly Dictionary<Type, PropertyData> BaseToPropertyData = new ();
-        private static bool _initialized;
-
-        private JsonSerializer _defaultSerializer;
-        private JsonSerializer GetDefaultSerializer(JsonSerializer serializer) => _defaultSerializer ??= CreateDefaultSerializer(serializer);
+        private Dictionary<Type, TypifyingPropertyData> BaseToPropertyData => PropertyDataProvider.BaseToPropertyData;
+        private readonly List<Type> _typesToIgnore = new ();
         
         /// <summary>
         /// Initializes a new instance of the <see cref="PolymorphicJsonConverter"/> class.
@@ -30,99 +25,7 @@ namespace DysonCore.PolymorphicJson.Converters
         /// <param name="assembliesToUse">Optional array of assemblies to use for initialization.</param>
         public PolymorphicJsonConverter(params Assembly[] assembliesToUse)
         {
-            if (assembliesToUse.Length > 0)
-            {
-                BaseToPropertyData.Clear();
-                InitializeConverter(assembliesToUse);
-            }
-            else
-            {
-                if (!_initialized)
-                {
-                    InitializeConverter();
-                }
-            }
-
-            _initialized = true;
-        }
-
-        /// <summary>
-        /// Initializes the converter by scanning the assemblies for types with the <see cref="TypifyingPropertyAttribute"/> 
-        /// and populates the BaseToPropertyData dictionary.
-        /// </summary>
-        /// <param name="assembliesToUse">List of assemblies to scan, if any. If null, the executing assembly and assemblies referencing current assembly are used.</param>
-        private static void InitializeConverter(params Assembly[] assembliesToUse)
-        {
-            List<(Type abstractType, PropertyData propertyData)> abstractDefiningData = new ();
-            Assembly[] assemblies = assembliesToUse.Length > 0 ? assembliesToUse : Assembly.GetExecutingAssembly().GetReferencingAssemblies();
-            
-            foreach (Assembly assembly in assemblies)
-            {
-                foreach (Type classType in assembly.GetTypes())
-                {
-                    foreach (PropertyInfo propertyInfo in classType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
-                    {
-                        TypifyingPropertyAttribute typifyingAttribute = propertyInfo.GetCustomAttribute<TypifyingPropertyAttribute>();
-                        
-                        if (typifyingAttribute == null)
-                        {
-                            continue;
-                        }
-
-                        Type propertyType = propertyInfo.PropertyType;
-                        JsonPropertyAttribute jsonProperty = propertyInfo.GetCustomAttribute<JsonPropertyAttribute>();
-
-                        Type baseClass = typifyingAttribute.InheritanceRoot ?? classType.GetDeclaringClass(propertyInfo.Name);
-                        TypifyingPropertyAttribute baseAttribute = baseClass.GetProperty(propertyInfo.Name)?.GetCustomAttribute<TypifyingPropertyAttribute>();
-
-                        if (baseAttribute == null)
-                        {
-                            throw new Exception($"[{nameof(PolymorphicJsonConverter)}.{nameof(InitializeConverter)}] {baseClass.Name} has no property with {nameof(TypifyingPropertyAttribute)} and \"{propertyInfo.Name}\" {nameof(propertyInfo.Name)}.\nReferencing class - {classType.FullName}.");
-                        }
-                        
-                        if (!BaseToPropertyData.TryGetValue(baseClass, out PropertyData propertyData))
-                        {
-                            propertyData = new PropertyData(propertyType, propertyInfo.Name, jsonProperty?.PropertyName, baseAttribute);
-                            BaseToPropertyData[baseClass] = propertyData;
-                        }
-                        
-                        if (classType.IsAbstract)
-                        {
-                            if (classType != baseClass)
-                            {
-                                abstractDefiningData.Add((classType, propertyData));
-                            }
-                            continue;
-                        }
-
-                        object classInstance = Activator.CreateInstance(classType, true);
-                        object propertyValue = propertyInfo.GetValue(classInstance);
-                        
-                        propertyData.ValuesData[propertyValue] = classType;
-                    }
-                }
-            }
-            
-            foreach (var data in abstractDefiningData)
-            {
-                if(!BaseToPropertyData.TryGetValue(data.abstractType, out PropertyData propertyData))
-                {
-                    continue;
-                }
-                
-                Type implementingClass = propertyData.ValuesData.Values.FirstOrDefault(type => !type.IsAbstract);
-                PropertyInfo propertyInfo = implementingClass?.GetProperty(data.propertyData.PropertyName);
-
-                if (propertyInfo is null)
-                {
-                    continue;
-                }
-
-                object classObject = Activator.CreateInstance(implementingClass, true);
-                object value = propertyInfo.GetValue(classObject);
-                
-                data.propertyData.ValuesData[value] = data.abstractType;
-            }
+            PropertyDataProvider.Initialize(assembliesToUse);
         }
 
         /// <summary>
@@ -131,29 +34,76 @@ namespace DysonCore.PolymorphicJson.Converters
         /// <returns>The deserialized object.</returns>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
+            _typesToIgnore.Clear();
             JToken token = JToken.Load(reader);
 
-            if (!BaseToPropertyData.TryGetValue(objectType, out PropertyData propertyData))
+            if (!BaseToPropertyData.TryGetValue(objectType, out TypifyingPropertyData propertyData) || propertyData.ValuesData.Count <= 0)
             {
-                return token.ToObject(objectType, GetDefaultSerializer(serializer));
+                _typesToIgnore.Add(objectType);
+                return token.ToObject(objectType, serializer);
             }
             
-            JToken typeToken = token.SelectToken(propertyData.JsonName);
-            object value = typeToken?.ToObject(propertyData.PropertyType);
+            JToken typifyingToken = token.SelectToken(propertyData.JsonName);
+            object value = typifyingToken?.ToObject(propertyData.PropertyType);
 
             if (value is null || !propertyData.ValuesData.TryGetValue(value, out Type implementer))
             {
-                switch (propertyData.TypifyingAttribute.UnknownTypeHandling)
+                if (propertyData.TypifiedProperties.Count <= 0)
                 {
-                    case UnknownTypeHandling.ReturnNull: return null;
-                    case UnknownTypeHandling.ThrowError:
-                    default: throw new JsonReaderException($"[{nameof(PolymorphicJsonConverter)}.{nameof(ReadJson)}] Can't parse typifying token or find concrete class. Typifying token - {typeToken}. Object type - {objectType.FullName}. Used type - {propertyData.PropertyType.FullName}");
+                    switch (propertyData.TypifyingAttribute.UnknownTypeHandling)
+                    {
+                        case UnknownTypeHandling.ReturnNull: return null;
+                        case UnknownTypeHandling.ThrowError:
+                        default: throw new JsonReaderException($"[{nameof(PolymorphicJsonConverter)}.{nameof(ReadJson)}] Can't parse typifying token or find concrete class. Typifying token - {typifyingToken}. Object type - {objectType.FullName}. Used type - {propertyData.PropertyType.FullName}");
+                    }
                 }
+
+                implementer = objectType;
             }
 
-            JsonSerializer jsonSerializer = objectType.IsAbstract ? serializer : GetDefaultSerializer(serializer);
+            token = TypifyTokenMembers(token, typifyingToken, propertyData);
+
+            if (objectType == implementer || !objectType.IsAbstract)
+            {
+                _typesToIgnore.Add(implementer);
+            }
             
-            return token.ToObject(implementer, jsonSerializer);
+            return token.ToObject(implementer, serializer);
+        }
+
+        private JToken TypifyTokenMembers(JToken currentToken, JToken typifyingToken, TypifyingPropertyData propertyData)
+        {
+            if (propertyData.TypifiedProperties.Count <= 0 || currentToken is not JObject currentJObject)
+            {
+                return currentToken;
+            }
+
+            foreach (TypifiedPropertyData typifiedProperty in propertyData.TypifiedProperties)
+            {
+                if (!currentJObject.TryGetValue(typifiedProperty.JsonName, out JToken valueToken))
+                {
+                    return null;
+                }
+                
+                switch (valueToken)
+                {
+                    case JObject jObject:
+                        jObject.TryAdd(propertyData.JsonName, typifyingToken);
+                        break;
+                    case JArray jArray:
+                        foreach (JToken token in jArray)
+                        {
+                            if (token is not JObject jObject)
+                            {
+                                continue;
+                            }
+                            jObject.TryAdd(propertyData.JsonName, typifyingToken);
+                        }
+                        break;
+                }
+            }
+            
+            return currentJObject;
         }
 
         /// <summary>
@@ -163,7 +113,7 @@ namespace DysonCore.PolymorphicJson.Converters
         /// <returns>True if the type can be converted; otherwise, false.</returns>
         public override bool CanConvert(Type objectType)
         {
-            return BaseToPropertyData.ContainsKey(objectType);
+            return BaseToPropertyData.ContainsKey(objectType) && !_typesToIgnore.Contains(objectType);
         }
 
         /// <inheritdoc />
@@ -171,27 +121,5 @@ namespace DysonCore.PolymorphicJson.Converters
 
         /// <inheritdoc />
         public override bool CanWrite => false;
-
-        /// <summary>
-        /// Creates a default JsonSerializer instance without the PolymorphicJsonConverter.
-        /// </summary>
-        /// <param name="currentSerializer">The current serializer being used.</param>
-        /// <returns>A new JsonSerializer instance.</returns>
-        private JsonSerializer CreateDefaultSerializer(JsonSerializer currentSerializer)
-        {
-            JsonSerializer defaultSerializer = new JsonSerializer();
-            
-            List<JsonConverter> defaultSettings = currentSerializer.Converters.ToList();
-            defaultSettings.RemoveAll(converter => converter is PolymorphicJsonConverter);
-            
-            foreach (JsonConverter converter in defaultSettings)
-            {
-                defaultSerializer.Converters.Add(converter);
-            }
-
-            defaultSerializer.ContractResolver = new IgnoreConvertersContractResolver(typeof(PolymorphicJsonConverter));
-
-            return defaultSerializer;
-        }
     }
 }
