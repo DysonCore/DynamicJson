@@ -6,7 +6,7 @@ namespace DysonCore.PolymorphicJson.Models
 {
     /// <summary>
     /// Represents metadata for properties marked with the <see cref="TypifyingPropertyAttribute"/>. 
-    /// Contains information about property type, name, JSON name, and the mapping between values and their respective types.
+    /// Contains information about property type, name, JSON name, and the mapping between values and their respective types, as well as any <see cref="TypifiedPropertyAttribute"/>s associated with this <see cref="TypifyingPropertyAttribute"/>.
     /// </summary>
     internal class TypifyingPropertyData : PropertyData
     {

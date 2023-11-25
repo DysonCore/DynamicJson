@@ -128,7 +128,7 @@ namespace DysonCore.PolymorphicJson.Providers
             Type propertyType = propertyInfo.PropertyType;
             JsonPropertyAttribute jsonProperty = propertyInfo.GetCustomAttribute<JsonPropertyAttribute>();
 
-            Type baseClass = typifyingAttribute.InheritanceRoot ?? classType.GetDeclaringClass(propertyInfo.Name);
+            Type baseClass = typifyingAttribute.InheritanceRoot ?? classType.GetDeclaringClass(propertyInfo.Name); //get base declaring class for the current property. Manual declaration of root class is prioritized.  
             TypifyingPropertyAttribute baseAttribute = baseClass.GetProperty(propertyInfo.Name)?.GetCustomAttribute<TypifyingPropertyAttribute>();
 
             if (baseAttribute == null)
@@ -136,15 +136,15 @@ namespace DysonCore.PolymorphicJson.Providers
                 throw new Exception($"[{nameof(PropertyDataProvider)}.{nameof(InitializeCache)}] {baseClass.Name} has no property with {nameof(TypifyingPropertyAttribute)} and \"{propertyInfo.Name}\" {nameof(propertyInfo.Name)}.\nReferencing class - {classType.FullName}.");
             }
 
-            if (!BaseToPropertyData.TryGetValue(baseClass, out TypifyingPropertyData propertyData))
+            if (!BaseToPropertyData.TryGetValue(baseClass, out TypifyingPropertyData propertyData)) //get or create TypifyingPropertyData from / in BaseToPropertyData.
             {
                 propertyData = new TypifyingPropertyData(propertyType, propertyInfo.Name, jsonProperty?.PropertyName, baseAttribute);
                 BaseToPropertyData[baseClass] = propertyData;
             }
 
-            if (classType.IsAbstract)
+            if (classType.IsAbstract) //if class is abstract - its impossible to create instance of it, so
             {
-                if (classType != baseClass)
+                if (classType != baseClass) //if current class is abstract class, and current class is not a class which defines current TypifyingProperty -> add this class to the list of abstract classes for post-processing. 
                 {
                     AbstractDefiningData.Add((classType, propertyData));
                 }
@@ -152,9 +152,10 @@ namespace DysonCore.PolymorphicJson.Providers
                 return;
             }
 
+            //create an instance of non-abstract class and get the value of its property marked with TypifyingPropertyAttribute.
             object classInstance = Activator.CreateInstance(classType, true);
             object propertyValue = propertyInfo.GetValue(classInstance);
-
+            //add to corresponding TypifyingPropertyData.
             propertyData.ValuesData[propertyValue] = classType;
         }
 
@@ -202,10 +203,11 @@ namespace DysonCore.PolymorphicJson.Providers
                 {
                     continue;
                 }
-
+                
+                //create an instance of non-abstract class and get the value of its property marked with TypifyingPropertyAttribute.
                 object classObject = Activator.CreateInstance(implementingClass, true);
                 object value = propertyInfo.GetValue(classObject);
-                
+                //add to corresponding TypifyingPropertyData.
                 data.propertyData.ValuesData[value] = data.abstractType;
             }
         }

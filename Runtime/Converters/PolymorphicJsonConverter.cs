@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 namespace DysonCore.PolymorphicJson.Converters
 {
     /// <summary>
-    /// Provides custom JSON deserialization for objects marked with <see cref="TypifyingPropertyAttribute"/>.
+    /// Provides custom JSON deserialization for objects marked with <see cref="TypifyingPropertyAttribute"/> ana <see cref="TypifiedPropertyAttribute"/>.
     /// </summary>
     public sealed class PolymorphicJsonConverter: JsonConverter
     {
@@ -20,7 +20,7 @@ namespace DysonCore.PolymorphicJson.Converters
         
         /// <summary>
         /// Initializes a new instance of the <see cref="PolymorphicJsonConverter"/> class.
-        /// Optionally takes an array of assemblies to be used for initialization.
+        /// Optionally takes an array of assemblies to be used for initialization of <see cref="PropertyDataProvider"/>.
         /// </summary>
         /// <param name="assembliesToUse">Optional array of assemblies to use for initialization.</param>
         public PolymorphicJsonConverter(params Assembly[] assembliesToUse)
@@ -29,7 +29,7 @@ namespace DysonCore.PolymorphicJson.Converters
         }
 
         /// <summary>
-        /// Deserializes a JSON object based on the defined typifying property.
+        /// Deserializes a JSON object based on the defined <see cref="TypifyingPropertyAttribute"/>.
         /// </summary>
         /// <returns>The deserialized object.</returns>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -71,6 +71,10 @@ namespace DysonCore.PolymorphicJson.Converters
             return token.ToObject(implementer, serializer);
         }
 
+        /// <summary>
+        /// Adds typifying <see cref="JToken"/> to the current token members which are marked with <see cref="TypifiedPropertyAttribute"/>.
+        /// </summary>
+        /// <returns><see cref="JToken"/> with typifying token added to the corresponding members.</returns>
         private JToken TypifyTokenMembers(JToken currentToken, JToken typifyingToken, TypifyingPropertyData propertyData)
         {
             if (propertyData.TypifiedProperties.Count <= 0 || currentToken is not JObject currentJObject)
