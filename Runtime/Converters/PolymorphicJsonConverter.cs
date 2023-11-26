@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 namespace DysonCore.PolymorphicJson.Converters
 {
     /// <summary>
-    /// Provides custom JSON deserialization for objects marked with <see cref="TypifyingPropertyAttribute"/> ana <see cref="TypifiedPropertyAttribute"/>.
+    /// Provides custom JSON deserialization for objects marked with <see cref="TypifyingPropertyAttribute"/> and <see cref="TypifiedPropertyAttribute"/>.
     /// </summary>
     public sealed class PolymorphicJsonConverter: JsonConverter
     {
