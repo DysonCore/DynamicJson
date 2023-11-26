@@ -140,9 +140,9 @@ In this example:
 
 When deserializing a list of `Animal`, **PolymorphicJson** will inspect the qualifiers and correctly instantiate `Dog` and `Cat` objects based on the provided JSON, even with such nested hierarchies.
 
-### Qualifying Properties
+## Typifying types
 
-**PolymorphicJson** allows a great deal of flexibility when choosing qualifying properties. Both `value types` and `reference types` that implement the `IEquatable<T>` interface are valid. This offers a vast array of possibilities in defining polymorphic relationships.
+**PolymorphicJson** allows a great deal of flexibility when choosing the type for typifying property. Both `value types` and `reference types` which implement the `IEquatable<T>` interface are valid.
 
 **\*Tip\*:** the most concise and convenient type for qualifying property is `enum` in combination with `StringEnumConverter`. 
 
@@ -172,7 +172,7 @@ When `TypifyingPropertyAttribute` encounters unknown value in qualifying propert
 - `UnknownTypeHandling.ThrowError` - Throws `JsonSerializationException`. 
 - `UnknownTypeHandling.ReturnNull` - Returns null for an object.
 
-By default `UnknownTypeHandling.ThrowError` is used. To specify otherwise, pass `UnknownTypeHandling` `enum` as a parameter in `TypifyingPropertyAttribute` constructor in the base class.  
+By default `UnknownTypeHandling.ThrowError` is used. To specify otherwise, pass `UnknownTypeHandling` `enum` as a parameter in `TypifyingPropertyAttribute` constructor in the root class.  
 
 ```csharp
 public abstract class Animal
@@ -181,6 +181,54 @@ public abstract class Animal
     public abstract string AnimalType { get; }
 }
 ```
+
+## Typified Properties
+The `TypifiedPropertyAttribute` allows You to deserialize polymorphic class members with the same `TypifyingPropertyAttribute` value as the main class. 
+
+Start by declaring the main class with `[TypifyingProperty]` and another root class of `IQuestProgress` as `[TypifiedProperty]`.
+```csharp
+public class Quest
+{
+    [TypifyingProperty]
+    public QuestType QuestType { get; private set; }
+
+    [TypifiedProperty]
+    public IQuestProgress Progress { get; private set; }
+}
+```
+```csharp
+public enum QuestType
+{
+    Normal,
+    Special
+}
+```
+
+`IQuestProgress` class and its inheritors should have the same structure as a regular polymorphic hierarchy with `TypifyingPropertyAttribute`.
+
+```csharp
+public interface IQuestProgress
+{
+    [TypifyingProperty]
+    QuestType QuestType { get; }
+}
+```
+```csharp
+private class NormalQuestProgress : IQuestProgress
+{
+    [TypifyingProperty(typeof(IQuestProgress))]
+    public QuestType QuestType => QuestType.Normal;
+}
+```
+```csharp
+private class SpecialQuestProgress : IQuestProgress
+{
+    [TypifyingProperty(typeof(IQuestProgress))]
+    public QuestType QuestType => QuestType.Special;
+}
+```
+
+With this setup `PolymorphicJsonConverter` will correctly deserialize `IQuestProgress` composite member of the `Quest` class by using `[TypifyingProperty] QuestType` value from the main class. 
 
 ## Initialization and Performance
 
@@ -193,6 +241,10 @@ Specifying assemblies directly can reduce the initialization time and garbage ge
 
 ## Known limitations
 -   Plain `[TypifyingProperty]` can not be used with the interface as an inheritance root! `[TypifyingProperty(typeof(Interface))]` should be used in derived classes instead.
+
+## Remarks
+-   Although unit tests are covering the most common use cases, it is never a bad idea to test Your polymorphic models and parsing correctness after initial implementation. 
+
 
 ## Feedback and Contributions
 
