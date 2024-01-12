@@ -267,7 +267,7 @@ public enum FoodType
 ```csharp
 public class Plate
 {
-[JsonConverter(typeof(SafeStringEnumConverter))] //or you can this converter to the JsonSerializerSettings.
+[JsonConverter(typeof(SafeStringEnumConverter))] //or you can add this converter to JsonSerializerSettings.
 public FoodType Food { get; set; }
 }
 
