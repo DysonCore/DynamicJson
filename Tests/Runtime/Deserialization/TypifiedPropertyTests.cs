@@ -17,8 +17,7 @@ namespace Tests.Runtime.Deserialization
         {
             _settings = new JsonSerializerSettings();
             _settings.Converters.Add(new PolymorphicJsonConverter());
-            _settings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy
-                { OverrideSpecifiedNames = false }));
+            _settings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy { OverrideSpecifiedNames = false }));
         }
         
         [Test]

@@ -246,6 +246,39 @@ Specifying assemblies directly can reduce the initialization time and garbage ge
 -   Although unit tests are covering the most common use cases, it is never a bad idea to test Your polymorphic models and parsing correctness after initial implementation. 
 
 
+## SafeStringEnumConverter
+
+`SafeStringEnumConverter` is an inheritor of Newtonsoft `StringEnumConverter` and it is designed to safely handle enum deserialization, providing additional support for default values via a custom `DefaultEnumValueAttribute`.
+
+### Usage
+
+Use the `DefaultEnumValueAttribute` to mark an enum member as the default value:
+
+```csharp
+public enum FoodType
+{
+    [DefaultEnumValue]
+    Unknown,
+    Pizza,
+    Burger
+    // other values...
+}
+```
+```csharp
+public class Plate
+{
+[JsonConverter(typeof(SafeStringEnumConverter))] //or you can this converter to the JsonSerializerSettings.
+public FoodType Food { get; set; }
+}
+
+string json = "{\"Food\":\"Sushi\"}"; // sushi is not present in FoodType enum.
+Plate plate = JsonConvert.DeserializeObject<Plate>(json);
+// Plate.Food will be set to FoodType.Unknown.
+```
+
+In this example, an invalid enum value in the JSON string is safely converted to the default `FoodType.Unknown`.
+
+
 ## Feedback and Contributions
 
 Your feedback is invaluable to **PolymorphicJson** improvements. For bug reports, suggestions, feature requests, or contributions, please visit the GitHub repository.

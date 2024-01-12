@@ -121,7 +121,7 @@ namespace DysonCore.PolymorphicJson.Converters
         }
 
         /// <inheritdoc />
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer){}
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) { }
 
         /// <inheritdoc />
         public override bool CanWrite => false;

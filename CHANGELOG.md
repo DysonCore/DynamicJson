@@ -1,3 +1,6 @@
+## [1.1.5] - 2024-01-12
+### SafeStringEnumConverter added
+
 ## [1.1.0] - 2023-11-25
 ### Polymorphism for composite classes
 
