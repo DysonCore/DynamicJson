@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DysonCore.PolymorphicJson.Attributes;
 using DysonCore.PolymorphicJson.Converters;
@@ -17,7 +18,7 @@ namespace Tests.Runtime.Deserialization
         public void SetUp()
         {
             _settings = new JsonSerializerSettings();
-            _settings.Converters.Add(new PolymorphicJsonConverter());
+            _settings.Converters.Add(new PolymorphicConverter());
             _settings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy { OverrideSpecifiedNames = false }));
         }
     
@@ -105,14 +106,19 @@ namespace Tests.Runtime.Deserialization
             string rewardsJson = JsonConvert.SerializeObject(wrappers, _settings);
             List<RewardWrapper> deserializedWrappers = JsonConvert.DeserializeObject<List<RewardWrapper>>(rewardsJson, _settings);
             
+            Assert.IsNotNull(deserializedWrappers);
+            Assert.IsTrue(deserializedWrappers.Count == wrappers.Count);
+            
             for (int i = 0; i < wrappers.Count; i++)
             {
+                Assert.IsNotNull(deserializedWrappers[i]);
+                Assert.IsNotNull(deserializedWrappers[i].Reward);
                 Assert.IsInstanceOf(wrappers[i].Reward.GetType(), deserializedWrappers[i].Reward);
             }
         }
         
         [Test]
-        public void DeserializeWrongType_NullValueHandling_ReturnNull_CompletesSuccessfully()
+        public void DeserializeWrongType_NullValueHandling_ReturnsNull()
         {
             string rewardsJson = "[{\"badgeNumber\":105,\"RewardType\":\"badge\"},{\"badgeNumber\":106,\"RewardType\":\"badge\"},{\"RewardType\":\"badge\",\"badgeNumber\":107}]";
             Assert.DoesNotThrow(() =>
@@ -126,7 +132,7 @@ namespace Tests.Runtime.Deserialization
         }
         
         [Test]
-        public void DeserializeWrongTypeComposition_NullValueHandling_ReturnNull_CompletesSuccessfully()
+        public void DeserializeWrongTypeComposition_NullValueHandling_ReturnsNull()
         {
             string rewardsJson = "[{\"Reward\":{\"badgeNumber\":105,\"RewardType\":\"badge\"}}]";
             Assert.DoesNotThrow(() =>
@@ -151,14 +157,42 @@ namespace Tests.Runtime.Deserialization
 
             string animalJson = JsonConvert.SerializeObject(animals, _settings);
             List<IAnimal> deserializedAnimals = JsonConvert.DeserializeObject<List<IAnimal>>(animalJson, _settings);
+            
+            Assert.IsNotNull(deserializedAnimals);
+            Assert.IsTrue(deserializedAnimals.Count == animals.Count);
 
             for (int i = 0; i < animals.Count; i++)
             {
+                Assert.IsNotNull(deserializedAnimals[i]);
                 Assert.IsInstanceOf(animals[i].GetType(), deserializedAnimals[i]);
             }
         }
         
-        #region TestModels_Reward
+        [Test]
+        public void DeserializeWithClassQualifier_CompletesSuccessfully()
+        {
+            List<Colour> colours = new List<Colour>
+            {
+                new Red(),
+                new Green(),
+                new White()
+            };
+
+            string coloursJson = JsonConvert.SerializeObject(colours, _settings);
+            List<Colour> deserializedColours = JsonConvert.DeserializeObject<List<Colour>>(coloursJson, _settings);
+            
+            Assert.IsNotNull(deserializedColours);
+            Assert.IsTrue(deserializedColours.Count == colours.Count);
+
+            for (int i = 0; i < colours.Count; i++)
+            {
+                Assert.IsNotNull(deserializedColours[i]);
+                Assert.IsInstanceOf(colours[i].GetType(), deserializedColours[i]);
+                Assert.AreEqual(colours[i].RGB, deserializedColours[i].RGB);
+            }
+        }
+        
+#region TestModels_Reward
 
         private class RewardWrapper
         {
@@ -231,9 +265,9 @@ namespace Tests.Runtime.Deserialization
             Special
         }
 
-        #endregion
+#endregion
         
-        #region TestModels_Animal
+#region TestModels_Animal
 
         private interface IAnimal
         {
@@ -267,7 +301,74 @@ namespace Tests.Runtime.Deserialization
             Fish
         }
         
-        #endregion
+#endregion
+
+#region TestModels_Colour
+
+        private abstract class Colour
+        {
+            [TypifyingProperty]
+            public abstract RGB RGB { get; }
+        }
+
+        private class Red : Colour
+        {
+            [TypifyingProperty]
+            public override RGB RGB { get; } = new RGB(255, 0, 0);
+        }
+        
+        private class Green : Colour
+        {
+            [TypifyingProperty]
+            public override RGB RGB { get; } = new RGB(0, 255, 0);
+        }
+        
+        private class White : Colour
+        {
+            [TypifyingProperty]
+            public override RGB RGB { get; } = new RGB(255, 255, 255);
+        }
+
+        private class RGB
+        {
+            public int R { get; }
+            public int G { get; }
+            public int B { get; }
+
+            public RGB(int r, int g, int b)
+            {
+                R = r;
+                G = g;
+                B = b;
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj))
+                {
+                    return false;
+                }
+
+                if (ReferenceEquals(this, obj))
+                {
+                    return true;
+                }
+                
+                return obj.GetType() == this.GetType() && Equals((RGB)obj);
+            }
+
+            private bool Equals(RGB other)
+            {
+                return R == other.R && G == other.G && B == other.B;
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(R, G, B);
+            }
+        }
+
+#endregion
 
     }
 }

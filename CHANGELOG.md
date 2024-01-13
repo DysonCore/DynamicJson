@@ -1,3 +1,6 @@
+## [1.1.6] - 2024-01-13
+### SafeStringEnumConverter integrated with PolymorphicConverter
+
 ## [1.1.5] - 2024-01-12
 ### SafeStringEnumConverter added
 

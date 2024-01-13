@@ -16,7 +16,7 @@ namespace Tests.Runtime.Deserialization
         public void SetUp()
         {
             _settings = new JsonSerializerSettings();
-            _settings.Converters.Add(new PolymorphicJsonConverter());
+            _settings.Converters.Add(new PolymorphicConverter());
             _settings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy { OverrideSpecifiedNames = false }));
         }
         
@@ -54,6 +54,9 @@ namespace Tests.Runtime.Deserialization
             string questsString = JsonConvert.SerializeObject(quests, _settings);
             List<Quest> deserializedQuestList = JsonConvert.DeserializeObject<List<Quest>>(questsString, _settings);
             
+            Assert.IsNotNull(deserializedQuestList);
+            Assert.IsTrue(quests.Count == deserializedQuestList.Count);
+            
             for (int i = 0; i < deserializedQuestList.Count; i++)
             {
                 Assert.IsNotNull(deserializedQuestList[i]);
@@ -64,7 +67,7 @@ namespace Tests.Runtime.Deserialization
         }
         
         
-        #region TestModels_Quests
+#region TestModels_Quests
 
         private class Quest
         {
@@ -128,7 +131,7 @@ namespace Tests.Runtime.Deserialization
             Temporary,
             Special
         }
-        
-        #endregion
+
+#endregion
     }
 }

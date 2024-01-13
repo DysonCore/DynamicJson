@@ -23,7 +23,7 @@ If You haven’t already, You can add it as a [UPM package](https://github.com/a
 
 ## Description
 
-- `PolymorphicJsonConverter` - Provides custom JSON deserialization for objects annotated with `TypifyingProperty` attribute.
+- `PolymorphicConverter` - Provides custom JSON deserialization for objects annotated with `TypifyingProperty` attribute.
 - `TypifyingPropertyAttribute` - Designates a property for polymorphic deserialization as a qualifier. This attribute should be applied both on the property declaration and its value assignment. 
 
 ## Usage
@@ -58,18 +58,18 @@ public class BadgeReward : Reward
     public string BadgeId { get; set; }
 }
 ```
-Lastly, integrate the `PolymorphicJsonConverter` into  `JsonSerializer` or `JsonSerializerSettings` (preferred method).
+Lastly, integrate the `PolymorphicConverter` into  `JsonSerializer` or `JsonSerializerSettings` (preferred method).
 ```csharp
 var settings = new JsonSerializerSettings();
-settings.Converters.Add(new PolymorphicJsonConverter());
+settings.Converters.Add(new PolymorphicConverter());
 ```
 ```csharp
 var serializer = new JsonSerializer();
-serializer.Converters.Add(new PolymorphicJsonConverter());
+serializer.Converters.Add(new PolymorphicConverter());
 ```
-As another option, You can annotate the base class with `[JsonConverter(typeof(PolymorphicJsonConverter))]` (though it is not a recommended approach).
+As another option, You can annotate the base class with `[JsonConverter(typeof(PolymorphicConverter))]` (though it is not a recommended approach).
 ```csharp
-[JsonConverter(typeof(PolymorphicJsonConverter))]
+[JsonConverter(typeof(PolymorphicConverter))]
 public abstract class Reward
 {
     //fields and properties...
@@ -86,7 +86,7 @@ List<Reward> rewards = new List<Reward>
 string rewardsJson = JsonConvert.SerializeObject(rewards);
 // rewardsJson value: [{"RewardType":"currency","Amount":100},{"RewardType":"badge","BadgeId":"newbie_badge_01"}]
 List<Reward> deserializedRewards = JsonConvert.DeserializeObject<List<Reward>>(rewardsJson); 
-// Note: The above has been tested with the [JsonConverter(typeof(PolymorphicJsonConverter))] attribute applied to the Reward class.
+// Note: The above has been tested with the [JsonConverter(typeof(PolymorphicConverter))] attribute applied to the Reward class.
 }
 ```
 Despite using the `abstract` `Reward` class for deserialization, the `deserializedRewards` list will correctly contain instances of the concrete `CurrencyReward` and `BadgeReward` classes.
@@ -142,9 +142,9 @@ When deserializing a list of `Animal`, **PolymorphicJson** will inspect the qual
 
 ## Typifying types
 
-**PolymorphicJson** allows a great deal of flexibility when choosing the type for typifying property. Both `value types` and `reference types` which implement the `IEquatable<T>` interface are valid.
+**PolymorphicJson** allows a great deal of flexibility when choosing the type for typifying property. Both `value types` and `reference types` which properly implement equality comparison are valid. I.e. `override bool Equals(object obj)` and `override int GetHashCode()`.
 
-**\*Tip\*:** the most concise and convenient type for qualifying property is `enum` in combination with `StringEnumConverter`. 
+**\*Tip\*:** the most concise and convenient type for qualifying property is `enum` in combination with `Newtonsoft.StringEnumConverter` or `PolymorphicJson.SafeStringEnumConverter`. 
 
 ### Interface as Inheritance Root 
 
@@ -228,14 +228,14 @@ private class SpecialQuestProgress : IQuestProgress
 }
 ```
 
-With this setup `PolymorphicJsonConverter` will correctly deserialize `IQuestProgress` composite member of the `Quest` class by using `[TypifyingProperty] QuestType` value from the main class. 
+With this setup `PolymorphicConverter` will correctly deserialize `IQuestProgress` composite member of the `Quest` class by using `[TypifyingProperty] QuestType` value from the main class. 
 
 ## Initialization and Performance
 
-`PolymorphicJsonConverter` requires knowledge of potential derived types for accurate deserialization. **By default**, the converter will scan assemblies which are referencing the **PolymorphicJson** assembly. However, for enhanced initialization performance, You can specify assemblies in constructor (single or array):
+`PolymorphicConverter` requires knowledge of potential derived types for accurate deserialization. **By default**, the converter will scan assemblies which are referencing the **PolymorphicJson** assembly. However, for enhanced initialization performance, You can specify assemblies in constructor (single or array):
 ```csharp
-var converter = new PolymorphicJsonConverter(Assembly.GetExecutingAssembly());
-// Note: creation of new PolymorphicJsonConverter instance will re-write converters static cache. 
+var converter = new PolymorphicConverter(Assembly.GetExecutingAssembly());
+// Note: creation of new PolymorphicConverter instance will re-write converters static cache. 
 ```
 Specifying assemblies directly can reduce the initialization time and garbage generation.
 
@@ -276,7 +276,7 @@ Plate plate = JsonConvert.DeserializeObject<Plate>(json);
 // Plate.Food will be set to FoodType.Unknown.
 ```
 
-In this example, an invalid enum value in the JSON string is safely converted to the default `FoodType.Unknown`.
+In this example, an invalid enum value in the JSON string is safely converted to `FoodType.Unknown`.
 
 
 ## Feedback and Contributions

@@ -13,17 +13,17 @@ namespace DysonCore.PolymorphicJson.Converters
     /// <summary>
     /// Provides custom JSON deserialization for objects marked with <see cref="TypifyingPropertyAttribute"/> and <see cref="TypifiedPropertyAttribute"/>.
     /// </summary>
-    public sealed class PolymorphicJsonConverter: JsonConverter
+    public sealed class PolymorphicConverter: JsonConverter
     {
         private Dictionary<Type, TypifyingPropertyData> BaseToPropertyData => PropertyDataProvider.BaseToPropertyData;
         private readonly List<Type> _typesToIgnore = new ();
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="PolymorphicJsonConverter"/> class.
+        /// Initializes a new instance of the <see cref="PolymorphicConverter"/> class.
         /// Optionally takes an array of assemblies to be used for initialization of <see cref="PropertyDataProvider"/>.
         /// </summary>
         /// <param name="assembliesToUse">Optional array of assemblies to use for initialization.</param>
-        public PolymorphicJsonConverter(params Assembly[] assembliesToUse)
+        public PolymorphicConverter(params Assembly[] assembliesToUse)
         {
             PropertyDataProvider.Initialize(assembliesToUse);
         }
@@ -44,7 +44,7 @@ namespace DysonCore.PolymorphicJson.Converters
             }
             
             JToken typifyingToken = token.SelectToken(propertyData.JsonName);
-            object value = typifyingToken?.ToObject(propertyData.PropertyType);
+            object value = typifyingToken?.ToObject(propertyData.PropertyType, serializer);
 
             if (value is null || !propertyData.ValuesData.TryGetValue(value, out Type implementer))
             {
@@ -54,7 +54,7 @@ namespace DysonCore.PolymorphicJson.Converters
                     {
                         case UnknownTypeHandling.ReturnNull: return null;
                         case UnknownTypeHandling.ThrowError:
-                        default: throw new JsonReaderException($"[{nameof(PolymorphicJsonConverter)}.{nameof(ReadJson)}] Can't parse typifying token or find concrete class. Typifying token - {typifyingToken}. Object type - {objectType.FullName}. Used type - {propertyData.PropertyType.FullName}");
+                        default: throw new JsonReaderException($"[{nameof(PolymorphicConverter)}.{nameof(ReadJson)}] Can't parse typifying token or find concrete class. Typifying token - {typifyingToken}. Object type - {objectType.FullName}. Used type - {propertyData.PropertyType.FullName}");
                     }
                 }
 
