@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using DysonCore.PolymorphicJson.Attributes;
-using DysonCore.PolymorphicJson.Converters;
-using DysonCore.PolymorphicJson.Enums;
+using DysonCore.PolymorphicJson.PolymorphicConverter;
+using DysonCore.PolymorphicJson.SafeStringEnumConverter;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -17,7 +16,7 @@ namespace Tests.Runtime.Deserialization
         public void SetUp()
         {
             _settings = new JsonSerializerSettings();
-            _settings.Converters.Add(new PolymorphicConverter());
+            _settings.Converters.Add(new PolymorphicConverter(UnknownTypeHandling.ReturnNull));
             _settings.Converters.Add(new SafeStringEnumConverter(new CamelCaseNamingStrategy { OverrideSpecifiedNames = false }));
         }
 
@@ -135,7 +134,7 @@ namespace Tests.Runtime.Deserialization
         public void RegularStringEnumConverter_DeserializeWithWrongEnums_ThrowsError()
         {
             JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.Converters.Add(new PolymorphicConverter());
+            settings.Converters.Add(new PolymorphicConverter(UnknownTypeHandling.ReturnNull));
             settings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy { OverrideSpecifiedNames = false }));
             
             //burger is not present in Food enum
@@ -156,7 +155,7 @@ namespace Tests.Runtime.Deserialization
 
         private abstract class Plate
         {
-            [TypifyingProperty(UnknownTypeHandling.ReturnNull)]
+            [TypifyingProperty]
             public abstract Food FoodType { get; }
         }
 

@@ -1,6 +1,6 @@
 using System;
 
-namespace DysonCore.PolymorphicJson.Attributes
+namespace DysonCore.PolymorphicJson.PolymorphicConverter
 {
     /// <summary>
     /// Marks property for polymorphic deserialization as a property qualified by <see cref="TypifyingPropertyAttribute"/>.

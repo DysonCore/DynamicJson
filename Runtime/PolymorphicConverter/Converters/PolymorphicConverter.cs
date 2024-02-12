@@ -1,31 +1,42 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using DysonCore.PolymorphicJson.Attributes;
-using DysonCore.PolymorphicJson.Enums;
-using DysonCore.PolymorphicJson.Models;
-using DysonCore.PolymorphicJson.Providers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace DysonCore.PolymorphicJson.Converters
+namespace DysonCore.PolymorphicJson.PolymorphicConverter
 {
     /// <summary>
-    /// Provides custom JSON deserialization for objects marked with <see cref="TypifyingPropertyAttribute"/> and <see cref="TypifiedPropertyAttribute"/>.
+    /// Provides custom JSON deserialization for objects marked with <see cref="TypifiedPropertyAttribute"/> and <see cref="TypifyingPropertyAttribute"/>.
     /// </summary>
-    public sealed class PolymorphicConverter: JsonConverter
+    public sealed class PolymorphicConverter : JsonConverter
     {
         private Dictionary<Type, TypifyingPropertyData> BaseToPropertyData => PropertyDataProvider.BaseToPropertyData;
         private readonly List<Type> _typesToIgnore = new ();
+
+        private UnknownTypeHandling UnknownTypeHandling { get; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PolymorphicConverter"/> class.
+        /// Optionally takes an array of assemblies to be used for initialization of <see cref="PropertyDataProvider"/>.
+        /// </summary>
+        /// <param name="unknownTypeHandling">Specifies how the converter treats unknown type cases. <see cref="UnknownTypeHandling.ThrowError"/> is used by default.</param>
+        /// <param name="assembliesToUse">Optional array of assemblies to use for initialization.</param>
+        public PolymorphicConverter(UnknownTypeHandling unknownTypeHandling = UnknownTypeHandling.ThrowError, params Assembly[] assembliesToUse)
+        {
+            UnknownTypeHandling = unknownTypeHandling;
+            PropertyDataProvider.Initialize(assembliesToUse);
+        }
         
         /// <summary>
         /// Initializes a new instance of the <see cref="PolymorphicConverter"/> class.
         /// Optionally takes an array of assemblies to be used for initialization of <see cref="PropertyDataProvider"/>.
         /// </summary>
-        /// <param name="assembliesToUse">Optional array of assemblies to use for initialization.</param>
-        public PolymorphicConverter(params Assembly[] assembliesToUse)
+        /// <param name="unknownTypeHandling">Specifies how the converter treats unknown type cases. <see cref="UnknownTypeHandling.ThrowError"/> is used by default.</param>
+        public PolymorphicConverter(UnknownTypeHandling unknownTypeHandling = UnknownTypeHandling.ThrowError)
         {
-            PropertyDataProvider.Initialize(assembliesToUse);
+            UnknownTypeHandling = unknownTypeHandling;
+            PropertyDataProvider.Initialize();
         }
 
         /// <summary>
@@ -50,7 +61,7 @@ namespace DysonCore.PolymorphicJson.Converters
             {
                 if (propertyData.TypifiedProperties.Count <= 0)
                 {
-                    switch (propertyData.TypifyingAttribute.UnknownTypeHandling)
+                    switch (UnknownTypeHandling)
                     {
                         case UnknownTypeHandling.ReturnNull: return null;
                         case UnknownTypeHandling.ThrowError:

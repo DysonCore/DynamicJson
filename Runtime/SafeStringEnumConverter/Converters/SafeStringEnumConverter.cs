@@ -1,11 +1,10 @@
 using System;
 using System.Reflection;
-using DysonCore.PolymorphicJson.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
-namespace DysonCore.PolymorphicJson.Converters
+namespace DysonCore.PolymorphicJson.SafeStringEnumConverter
 {
     public class SafeStringEnumConverter : StringEnumConverter
     {

@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using DysonCore.PolymorphicJson.Attributes;
-using DysonCore.PolymorphicJson.Converters;
-using DysonCore.PolymorphicJson.Enums;
+using DysonCore.PolymorphicJson.PolymorphicConverter;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -18,7 +16,7 @@ namespace Tests.Runtime.Deserialization
         public void SetUp()
         {
             _settings = new JsonSerializerSettings();
-            _settings.Converters.Add(new PolymorphicConverter());
+            _settings.Converters.Add(new PolymorphicConverter(UnknownTypeHandling.ReturnNull));
             _settings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy { OverrideSpecifiedNames = false }));
         }
     
@@ -201,12 +199,14 @@ namespace Tests.Runtime.Deserialization
         
         private abstract class Reward
         {
-            [TypifyingProperty] public abstract RewardType RewardType { get; }
+            [TypifyingProperty] 
+            public abstract RewardType RewardType { get; }
         }
 
         private abstract class CurrencyReward : Reward
         {
-            [TypifyingProperty] public sealed override RewardType RewardType => RewardType.Currency;
+            [TypifyingProperty] 
+            public sealed override RewardType RewardType => RewardType.Currency;
 
             [TypifyingProperty]
             [JsonProperty("currencyType")]
@@ -215,47 +215,56 @@ namespace Tests.Runtime.Deserialization
 
         private class GoldReward : CurrencyReward
         {
-            [TypifyingProperty] public override string Currency => "Gold";
+            [TypifyingProperty] 
+            public override string Currency => "Gold";
         }
 
         private class CoinReward : CurrencyReward
         {
-            [TypifyingProperty] public override string Currency => "Coin";
+            [TypifyingProperty] 
+            public override string Currency => "Coin";
         }
 
         private class NewbieBadge : Reward
         {
-            [TypifyingProperty] public sealed override RewardType RewardType => RewardType.Badge;
+            [TypifyingProperty] 
+            public sealed override RewardType RewardType => RewardType.Badge;
 
-            [TypifyingProperty(UnknownTypeHandling.ReturnNull)]
+            [TypifyingProperty]
             [JsonProperty("badgeNumber")]
             public virtual int BadgeId => 100;
         }
 
         private class WarriorBadge : NewbieBadge
         {
-            [TypifyingProperty] public override int BadgeId => 101;
+            [TypifyingProperty] 
+            public override int BadgeId => 101;
         }
 
         private class MageBadge : NewbieBadge
         {
-            [TypifyingProperty] public override int BadgeId => 102;
+            [TypifyingProperty] 
+            public override int BadgeId => 102;
         }
 
         private abstract class SpecialReward : Reward
         {
-            [TypifyingProperty] public sealed override RewardType RewardType => RewardType.Special;
-            [TypifyingProperty] public abstract bool IsLimitedEdition { get; }
+            [TypifyingProperty] 
+            public sealed override RewardType RewardType => RewardType.Special;
+            [TypifyingProperty] 
+            public abstract bool IsLimitedEdition { get; }
         }
 
         private class LimitedEditionReward : SpecialReward
         {
-            [TypifyingProperty] public sealed override bool IsLimitedEdition => true;
+            [TypifyingProperty] 
+            public sealed override bool IsLimitedEdition => true;
         }
 
         private class RegularEditionReward : SpecialReward
         {
-            [TypifyingProperty] public sealed override bool IsLimitedEdition => false;
+            [TypifyingProperty] 
+            public sealed override bool IsLimitedEdition => false;
         }
 
         private enum RewardType

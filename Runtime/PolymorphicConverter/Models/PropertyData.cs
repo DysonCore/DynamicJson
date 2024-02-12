@@ -1,6 +1,6 @@
 using System;
 
-namespace DysonCore.PolymorphicJson.Models
+namespace DysonCore.PolymorphicJson.PolymorphicConverter
 {
     /// <summary>
     /// Base class representing metadata for properties used by polymorphic converter. 

@@ -1,6 +1,6 @@
 using System;
 
-namespace DysonCore.PolymorphicJson.Models
+namespace DysonCore.PolymorphicJson.PolymorphicConverter
 {
     /// <summary>
     /// Represents metadata for typified properties. 

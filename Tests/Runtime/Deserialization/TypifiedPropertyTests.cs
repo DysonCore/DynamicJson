@@ -1,6 +1,5 @@
 using System.Collections.Generic;
-using DysonCore.PolymorphicJson.Attributes;
-using DysonCore.PolymorphicJson.Converters;
+using DysonCore.PolymorphicJson.PolymorphicConverter;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;

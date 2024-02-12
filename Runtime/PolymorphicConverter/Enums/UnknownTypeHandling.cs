@@ -1,4 +1,4 @@
-namespace DysonCore.PolymorphicJson.Enums
+namespace DysonCore.PolymorphicJson.PolymorphicConverter
 {
     public enum UnknownTypeHandling
     {

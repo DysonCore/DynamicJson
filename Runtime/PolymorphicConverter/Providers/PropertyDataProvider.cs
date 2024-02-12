@@ -2,12 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DysonCore.PolymorphicJson.Attributes;
-using DysonCore.PolymorphicJson.Models;
 using DysonCore.PolymorphicJson.Utils;
 using Newtonsoft.Json;
 
-namespace DysonCore.PolymorphicJson.Providers
+namespace DysonCore.PolymorphicJson.PolymorphicConverter
 {
     /// <summary>
     /// Provides a centralized data provider for managing <see cref="PropertyData"/> mappings used by polymorphic converter.

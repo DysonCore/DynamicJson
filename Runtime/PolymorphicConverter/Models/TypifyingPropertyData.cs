@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using DysonCore.PolymorphicJson.Attributes;
 
-namespace DysonCore.PolymorphicJson.Models
+namespace DysonCore.PolymorphicJson.PolymorphicConverter
 {
     /// <summary>
     /// Represents metadata for properties marked with the <see cref="TypifyingPropertyAttribute"/>. 
