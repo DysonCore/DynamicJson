@@ -1,6 +1,6 @@
 {
     "name": "DysonCore.DynamicJson.Tests.Runtime",
-    "rootNamespace": "DynamicJson.Tests.Runtime",
+    "rootNamespace": "DysonCore.DynamicJson.Tests.Runtime",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
