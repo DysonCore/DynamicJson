@@ -1,6 +1,6 @@
 using System;
 
-namespace DysonCore.PolymorphicJson.SafeStringEnumConverter
+namespace DysonCore.DynamicJson.SafeStringEnumConverter
 {
     /// <summary>
     /// Marks enum field as a default value for SafeStringEnumConverter.

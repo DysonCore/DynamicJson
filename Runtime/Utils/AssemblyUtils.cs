@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace DysonCore.PolymorphicJson.Utils
+namespace DysonCore.DynamicJson.Utils
 {
     /// <summary>
     /// Provides package-internal <see cref="Assembly"/> utility methods.

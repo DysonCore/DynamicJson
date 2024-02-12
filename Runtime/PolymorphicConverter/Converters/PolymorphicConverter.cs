@@ -4,7 +4,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace DysonCore.PolymorphicJson.PolymorphicConverter
+namespace DysonCore.DynamicJson.PolymorphicConverter
 {
     /// <summary>
     /// Provides custom JSON deserialization for objects marked with <see cref="TypifiedPropertyAttribute"/> and <see cref="TypifyingPropertyAttribute"/>.

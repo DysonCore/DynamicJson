@@ -1,6 +1,6 @@
 {
-    "name": "DysonCore.PolymorphicJson",
-    "rootNamespace": "DysonCore.PolymorphicJson",
+    "name": "DysonCore.DynamicJson",
+    "rootNamespace": "DysonCore.DynamicJson",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

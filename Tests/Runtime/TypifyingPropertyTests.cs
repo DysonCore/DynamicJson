@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using DysonCore.PolymorphicJson.PolymorphicConverter;
+using DysonCore.DynamicJson.PolymorphicConverter;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
 
-namespace Tests.Runtime.Deserialization
+namespace DysonCore.DynamicJson.Tests.Runtime
 {
     public class TypifyingPropertyTests 
     {
@@ -16,7 +16,7 @@ namespace Tests.Runtime.Deserialization
         public void SetUp()
         {
             _settings = new JsonSerializerSettings();
-            _settings.Converters.Add(new PolymorphicConverter(UnknownTypeHandling.ReturnNull));
+            _settings.Converters.Add(new PolymorphicConverter.PolymorphicConverter(UnknownTypeHandling.ReturnNull));
             _settings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy { OverrideSpecifiedNames = false }));
         }
     

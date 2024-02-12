@@ -1,10 +1,10 @@
 {
-    "name": "DysonCore.PolymorphicJson.Tests.Runtime",
-    "rootNamespace": "",
+    "name": "DysonCore.DynamicJson.Tests.Runtime",
+    "rootNamespace": "DynamicJson.Tests.Runtime",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "DysonCore.PolymorphicJson"
+        "DysonCore.DynamicJson"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
