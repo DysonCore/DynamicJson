@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace DysonCore.DynamicJson.Utils
+namespace DysonCore.DynamicJson.PolymorphicConverter
 {
     /// <summary>
-    /// Provides package-internal <see cref="Assembly"/> utility methods.
+    /// Provides internal <see cref="Assembly"/> utility methods.
     /// </summary>
     internal static class AssemblyUtils
     {

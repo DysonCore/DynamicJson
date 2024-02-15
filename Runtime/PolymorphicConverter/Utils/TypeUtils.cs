@@ -1,10 +1,10 @@
 using System;
 using System.Reflection;
 
-namespace DysonCore.DynamicJson.Utils
+namespace DysonCore.DynamicJson.PolymorphicConverter
 {
     /// <summary>
-    /// Provides package-internal <see cref="Type"/> utility methods.
+    /// Provides internal <see cref="Type"/> utility methods.
     /// </summary>
     internal static class TypeUtils
     {
@@ -24,7 +24,7 @@ namespace DysonCore.DynamicJson.Utils
         {
             if (currentType == null)
             {
-                throw new ArgumentNullException($"[{nameof(Utils)}.{nameof(GetDeclaringClass)}] {nameof(currentType)} is null. {nameof(propertyName)} - {propertyName}");
+                throw new ArgumentNullException($"[{nameof(TypeUtils)}.{nameof(GetDeclaringClass)}] {nameof(currentType)} is null. {nameof(propertyName)} - {propertyName}");
             }
             
             Type definingType = currentType;

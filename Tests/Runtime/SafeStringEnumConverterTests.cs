@@ -144,7 +144,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime
         }
 
 #region TestModels_Foods
-
+        
         private enum Food
         {
             [DefaultEnumValue]
