@@ -31,6 +31,8 @@ namespace DysonCore.DynamicJson.PolymorphicConverter
         /// Indicates whether the PropertyDataProvider has been initialized, to prevent redundant initializations.
         /// </summary>
         private static bool _initialized;
+
+        private static readonly object InitializationLock = new object();
         
         /// <summary>
         /// Initializes the <see cref="PropertyDataProvider"/> with data from the specified assemblies.
@@ -39,20 +41,23 @@ namespace DysonCore.DynamicJson.PolymorphicConverter
         /// <param name="assembliesToUse">The assemblies to scan for <see cref="TypifyingPropertyAttribute"/> and <see cref="TypifiedPropertyAttribute"/>. If left empty - all the assemblies which are referencing this assembly will be scanned.</param>
         internal static void Initialize(params Assembly[] assembliesToUse)
         {
-            if (assembliesToUse.Length > 0)
+            lock (InitializationLock)
             {
-                BaseToPropertyData.Clear();
-                InitializeCache(assembliesToUse);
-            }
-            else
-            {
-                if (!_initialized)
+                if (assembliesToUse.Length > 0)
                 {
-                    InitializeCache(Assembly.GetExecutingAssembly().GetReferencingAssemblies());
+                    BaseToPropertyData.Clear();
+                    InitializeCache(assembliesToUse);
                 }
-            }
+                else
+                {
+                    if (!_initialized)
+                    {
+                        InitializeCache(Assembly.GetExecutingAssembly().GetReferencingAssemblies());
+                    }
+                }
 
-            _initialized = true;
+                _initialized = true;
+            }
         }
         
         /// <summary>
