@@ -6,9 +6,5 @@ namespace DysonCore.DynamicJson.InjectionConverter
         {
             Value = Resolve(identifier);
         }
-
-        public EagerInjectableModel(TModel model) : base(model)
-        {
-        }
     }
 }

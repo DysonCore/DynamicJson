@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 
-namespace DysonCore.DynamicJson.InjectionConverter.Registries
+namespace DysonCore.DynamicJson.InjectionConverter
 {
     internal static class ProviderRegistry
     {

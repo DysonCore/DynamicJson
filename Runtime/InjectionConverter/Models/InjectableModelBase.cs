@@ -1,5 +1,4 @@
 using System;
-using DysonCore.DynamicJson.InjectionConverter.Registries;
 
 namespace DysonCore.DynamicJson.InjectionConverter
 {
@@ -17,10 +16,7 @@ namespace DysonCore.DynamicJson.InjectionConverter
             set => SetIdentifier(value);
         }
 
-        public InjectableModelBase(TModel model)
-        {
-            Model = model;
-        }
+        public static implicit operator TModel(InjectableModelBase<TModel> injectableModel) => injectableModel.Value;
 
         protected abstract void SetIdentifier(object identifier);
 

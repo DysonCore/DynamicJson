@@ -1,5 +1,3 @@
-using DysonCore.DynamicJson.InjectionConverter.Registries;
-
 namespace DysonCore.DynamicJson.InjectionConverter
 {
     public abstract class InjectionDataProvider<TKey, TValue> : IInjectionDataProvider<TKey, TValue>

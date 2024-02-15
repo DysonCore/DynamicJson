@@ -14,9 +14,5 @@ namespace DysonCore.DynamicJson.InjectionConverter
         {
             _identifier = identifier;
         }
-
-        public LazyInjectableModel(TModel model) : base(model)
-        {
-        }
     }
 }
