@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -12,7 +13,7 @@ namespace DysonCore.DynamicJson.PolymorphicConverter
     public sealed class PolymorphicConverter : JsonConverter
     {
         private Dictionary<Type, TypifyingPropertyData> BaseToPropertyData => PropertyDataProvider.BaseToPropertyData;
-        private readonly List<Type> _typesToIgnore = new ();
+        private readonly ThreadLocal<List<Type>> _typesToIgnore = new (() => new List<Type>());
 
         private UnknownTypeHandling UnknownTypeHandling { get; }
 
@@ -45,12 +46,12 @@ namespace DysonCore.DynamicJson.PolymorphicConverter
         /// <returns>The deserialized object.</returns>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            _typesToIgnore.Clear();
+            _typesToIgnore.Value.Clear();
             JToken token = JToken.Load(reader);
 
             if (!BaseToPropertyData.TryGetValue(objectType, out TypifyingPropertyData propertyData) || propertyData.ValuesData.Count <= 0)
             {
-                _typesToIgnore.Add(objectType);
+                _typesToIgnore.Value.Add(objectType);
                 return token.ToObject(objectType, serializer);
             }
             
@@ -76,7 +77,7 @@ namespace DysonCore.DynamicJson.PolymorphicConverter
 
             if (objectType == implementer || !objectType.IsAbstract)
             {
-                _typesToIgnore.Add(implementer);
+                _typesToIgnore.Value.Add(implementer);
             }
             
             return token.ToObject(implementer, serializer);
@@ -128,7 +129,7 @@ namespace DysonCore.DynamicJson.PolymorphicConverter
         /// <returns>True if the type can be converted; otherwise, false.</returns>
         public override bool CanConvert(Type objectType)
         {
-            return BaseToPropertyData.ContainsKey(objectType) && !_typesToIgnore.Contains(objectType);
+            return BaseToPropertyData.ContainsKey(objectType) && !_typesToIgnore.Value.Contains(objectType);
         }
 
         /// <inheritdoc />
