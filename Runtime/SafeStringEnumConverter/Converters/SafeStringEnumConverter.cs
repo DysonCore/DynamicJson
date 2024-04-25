@@ -6,7 +6,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace DysonCore.DynamicJson.SafeStringEnumConverter
 {
-    public class SafeStringEnumConverter : StringEnumConverter
+    public sealed class SafeStringEnumConverter : StringEnumConverter
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SafeStringEnumConverter"/> class.

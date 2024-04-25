@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace DysonCore.DynamicJson.PolymorphicConverter
 {
@@ -9,15 +9,14 @@ namespace DysonCore.DynamicJson.PolymorphicConverter
     /// </summary>
     internal class TypifyingPropertyData : PropertyData
     {
-        internal TypifyingPropertyAttribute TypifyingAttribute { get; }
-        internal Dictionary<object, Type> ValuesData { get; }
+        [JsonProperty("valuesData")]
+        internal Dictionary<object, TypeLazyReference> ValuesData { get; }
+        [JsonProperty("typifiedProperties")]
         internal List<TypifiedPropertyData> TypifiedProperties { get; }
 
-        internal TypifyingPropertyData(Type propertyType, string propertyName, string jsonName, TypifyingPropertyAttribute baseTypifyingAttribute) : base(propertyType, propertyName, jsonName)
+        internal TypifyingPropertyData(TypeLazyReference propertyType, string propertyName, string jsonName, TypifyingPropertyAttribute baseTypifyingAttribute) : base(propertyType, propertyName, jsonName)
         {
-            TypifyingAttribute = baseTypifyingAttribute;
-            
-            ValuesData = new Dictionary<object, Type>();
+            ValuesData = new Dictionary<object, TypeLazyReference>();
             TypifiedProperties = new List<TypifiedPropertyData>();
         }
     }

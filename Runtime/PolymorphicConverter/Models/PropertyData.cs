@@ -1,4 +1,4 @@
-using System;
+using Newtonsoft.Json;
 
 namespace DysonCore.DynamicJson.PolymorphicConverter
 {
@@ -8,11 +8,16 @@ namespace DysonCore.DynamicJson.PolymorphicConverter
     /// </summary>
     internal abstract class PropertyData
     {
-        internal Type PropertyType { get; }
+        [JsonProperty("propertyType")]
+        internal TypeLazyReference PropertyType { get; }
+        
+        [JsonProperty("name")]
         internal string PropertyName { get; }
+        
+        [JsonProperty("jsonName")]
         internal string JsonName { get; }
 
-        protected PropertyData(Type propertyType, string propertyName, string jsonName)
+        protected PropertyData(TypeLazyReference propertyType, string propertyName, string jsonName)
         {
             PropertyType = propertyType;
             PropertyName = propertyName;

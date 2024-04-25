@@ -9,8 +9,8 @@ namespace DysonCore.DynamicJson.PolymorphicConverter
     [AttributeUsage(AttributeTargets.Property, Inherited = false)]
     public sealed class TypifyingPropertyAttribute : Attribute
     {
-        public Type InheritanceRoot { get; }
-
+        internal Type InheritanceRoot { get; }
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="TypifyingPropertyAttribute"/> class.
         /// </summary>

@@ -3,13 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace DysonCore.DynamicJson.PolymorphicConverter
+namespace DysonCore.DynamicJson
 {
     /// <summary>
     /// Provides internal <see cref="Assembly"/> utility methods.
     /// </summary>
     internal static class AssemblyUtils
     {
+        /// <summary>
+        /// Returns runtime <see cref="Assembly"/> of <see cref="DynamicJson"/> package.
+        /// </summary>
+        internal static Assembly GetPackageRuntimeAssembly()
+        {
+            return Assembly.GetExecutingAssembly();
+        }
+        
         /// <summary>
         /// Retrieves assemblies that reference the given assembly.
         /// </summary>

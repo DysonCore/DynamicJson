@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -12,32 +11,20 @@ namespace DysonCore.DynamicJson.PolymorphicConverter
     /// </summary>
     public sealed class PolymorphicConverter : JsonConverter
     {
-        private Dictionary<Type, TypifyingPropertyData> BaseToPropertyData => PropertyDataProvider.BaseToPropertyData;
+        private readonly Dictionary<TypeLazyReference, TypifyingPropertyData> _baseToPropertyData;
         private readonly ThreadLocal<List<Type>> _typesToIgnore = new (() => new List<Type>());
 
         private UnknownTypeHandling UnknownTypeHandling { get; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PolymorphicConverter"/> class.
-        /// Optionally takes an array of assemblies to be used for initialization of <see cref="PropertyDataProvider"/>.
-        /// </summary>
-        /// <param name="unknownTypeHandling">Specifies how the converter treats unknown type cases. <see cref="UnknownTypeHandling.ThrowError"/> is used by default.</param>
-        /// <param name="assembliesToUse">Optional array of assemblies to use for initialization.</param>
-        public PolymorphicConverter(UnknownTypeHandling unknownTypeHandling = UnknownTypeHandling.ThrowError, params Assembly[] assembliesToUse)
-        {
-            UnknownTypeHandling = unknownTypeHandling;
-            PropertyDataProvider.Initialize(assembliesToUse);
-        }
         
         /// <summary>
         /// Initializes a new instance of the <see cref="PolymorphicConverter"/> class.
-        /// Optionally takes an array of assemblies to be used for initialization of <see cref="PropertyDataProvider"/>.
+        /// Optionally takes an array of assemblies to be used for initialization of <see cref="PolymorphicCacheProvider"/>.
         /// </summary>
         /// <param name="unknownTypeHandling">Specifies how the converter treats unknown type cases. <see cref="UnknownTypeHandling.ThrowError"/> is used by default.</param>
         public PolymorphicConverter(UnknownTypeHandling unknownTypeHandling = UnknownTypeHandling.ThrowError)
         {
             UnknownTypeHandling = unknownTypeHandling;
-            PropertyDataProvider.Initialize();
+            _baseToPropertyData = PolymorphicCacheProvider.GetData();
         }
 
         /// <summary>
@@ -48,17 +35,18 @@ namespace DysonCore.DynamicJson.PolymorphicConverter
         {
             _typesToIgnore.Value.Clear();
             JToken token = JToken.Load(reader);
+            TypeLazyReference type = (TypeLazyReference)objectType;
 
-            if (!BaseToPropertyData.TryGetValue(objectType, out TypifyingPropertyData propertyData) || propertyData.ValuesData.Count <= 0)
+            if (!_baseToPropertyData.TryGetValue(type, out TypifyingPropertyData propertyData) || propertyData.ValuesData.Count <= 0)
             {
                 _typesToIgnore.Value.Add(objectType);
                 return token.ToObject(objectType, serializer);
             }
             
             JToken typifyingToken = token.SelectToken(propertyData.JsonName);
-            object value = typifyingToken?.ToObject(propertyData.PropertyType, serializer);
+            object value = typifyingToken?.ToObject(propertyData.PropertyType.Type, serializer);
 
-            if (value is null || !propertyData.ValuesData.TryGetValue(value, out Type implementer))
+            if (value is null || !propertyData.ValuesData.TryGetValue(value, out TypeLazyReference implementer))
             {
                 if (propertyData.TypifiedProperties.Count <= 0)
                 {
@@ -66,21 +54,21 @@ namespace DysonCore.DynamicJson.PolymorphicConverter
                     {
                         case UnknownTypeHandling.ReturnNull: return null;
                         case UnknownTypeHandling.ThrowError:
-                        default: throw new JsonReaderException($"[{nameof(PolymorphicConverter)}.{nameof(ReadJson)}] Can't parse typifying token or find concrete class. Typifying token - {typifyingToken}. Object type - {objectType.FullName}. Used type - {propertyData.PropertyType.FullName}");
+                        default: throw new JsonReaderException($"[{nameof(PolymorphicConverter)}.{nameof(ReadJson)}] Can't parse typifying token or find concrete class. Typifying token - {typifyingToken}. Object type - {objectType.FullName}. Used type - {propertyData.PropertyType.Type.FullName}");
                     }
                 }
 
-                implementer = objectType;
+                implementer = type;
             }
 
             token = TypifyTokenMembers(token, typifyingToken, propertyData);
 
-            if (objectType == implementer || !objectType.IsAbstract)
+            if (type.Equals(implementer) || !objectType.IsAbstract)
             {
-                _typesToIgnore.Value.Add(implementer);
+                _typesToIgnore.Value.Add(implementer.Type);
             }
             
-            return token.ToObject(implementer, serializer);
+            return token.ToObject(implementer.Type, serializer);
         }
 
         /// <summary>
@@ -129,7 +117,7 @@ namespace DysonCore.DynamicJson.PolymorphicConverter
         /// <returns>True if the type can be converted; otherwise, false.</returns>
         public override bool CanConvert(Type objectType)
         {
-            return BaseToPropertyData.ContainsKey(objectType) && !_typesToIgnore.Value.Contains(objectType);
+            return _baseToPropertyData.ContainsKey((TypeLazyReference)objectType) && !_typesToIgnore.Value.Contains(objectType);
         }
 
         /// <inheritdoc />

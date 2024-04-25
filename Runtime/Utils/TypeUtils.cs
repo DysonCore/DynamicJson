@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace DysonCore.DynamicJson.PolymorphicConverter
+namespace DysonCore.DynamicJson
 {
     /// <summary>
     /// Provides internal <see cref="Type"/> utility methods.
