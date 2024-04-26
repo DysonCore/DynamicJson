@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DysonCore.DynamicJson.PolymorphicConverter.Configurations
+namespace DysonCore.DynamicJson.PolymorphicParser
 {
     public class PolymorphicConverterConfiguration : ScriptableObject 
     {

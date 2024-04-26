@@ -1,6 +1,6 @@
 using System;
 
-namespace DysonCore.DynamicJson.PolymorphicConverter
+namespace DysonCore.DynamicJson.PolymorphicParser
 {
     internal sealed class TypeLazyReference
     {

@@ -1,6 +1,4 @@
-using System.IO;
-
-namespace DysonCore.DynamicJson.PolymorphicConverter
+namespace DysonCore.DynamicJson.PolymorphicParser
 {
     public class PolymorphicCacheConstants
     {

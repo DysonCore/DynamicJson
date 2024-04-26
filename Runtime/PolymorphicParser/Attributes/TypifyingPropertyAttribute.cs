@@ -1,6 +1,6 @@
 using System;
 
-namespace DysonCore.DynamicJson.PolymorphicConverter
+namespace DysonCore.DynamicJson.PolymorphicParser
 {
     /// <summary>
     /// Marks property for polymorphic deserialization as a qualifier.

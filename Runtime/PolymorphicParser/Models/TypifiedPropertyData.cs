@@ -1,4 +1,4 @@
-namespace DysonCore.DynamicJson.PolymorphicConverter
+namespace DysonCore.DynamicJson.PolymorphicParser
 {
     /// <summary>
     /// Represents metadata for typified properties. 

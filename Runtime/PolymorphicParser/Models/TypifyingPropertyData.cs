@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace DysonCore.DynamicJson.PolymorphicConverter
+namespace DysonCore.DynamicJson.PolymorphicParser
 {
     /// <summary>
     /// Represents metadata for properties marked with the <see cref="TypifyingPropertyAttribute"/>. 

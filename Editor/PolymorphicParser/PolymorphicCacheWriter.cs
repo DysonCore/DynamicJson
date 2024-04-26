@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
-using DysonCore.DynamicJson.PolymorphicConverter;
+using DysonCore.DynamicJson.PolymorphicParser;
 using Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
 
-namespace DysonCore.DynamicJson.Editor.PolymorphicConverter
+namespace DysonCore.DynamicJson.Editor.PolymorphicParser
 {
     [InitializeOnLoad]
     internal static class PolymorphicCacheWriter

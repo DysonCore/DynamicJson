@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace DysonCore.DynamicJson.PolymorphicConverter
+namespace DysonCore.DynamicJson.PolymorphicParser
 {
     /// <summary>
     /// Base class representing metadata for properties used by polymorphic converter. 

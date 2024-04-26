@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using DysonCore.DynamicJson.PolymorphicConverter;
+using DysonCore.DynamicJson.PolymorphicParser;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -15,7 +15,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime
         public void SetUp()
         {
             _settings = new JsonSerializerSettings();
-            _settings.Converters.Add(new PolymorphicConverter.PolymorphicConverter());
+            _settings.Converters.Add(new PolymorphicConverter());
             _settings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy { OverrideSpecifiedNames = false }));
         }
         
@@ -39,6 +39,39 @@ namespace DysonCore.DynamicJson.Tests.Runtime
             
             Assert.IsInstanceOf<NormalQuestProgress>(deserializedNormalQuest.Progress);
             Assert.IsInstanceOf<SpecialQuestProgress>(deserializedSpecialQuest.Progress);
+        }
+        
+        [Test]
+        public void DeserializeCompositeClass_CompletesSuccessfully()
+        {
+            Reward defaultReward = new Reward(new RewardData());
+            Reward normalReward = new Reward(new NormalRewardData());
+            Reward superReward = new Reward(new SuperRewardData());
+            Reward fallbackReward = new Reward("fallback");
+
+            string defaultRewardString = JsonConvert.SerializeObject(defaultReward, _settings);
+            string normalRewardString = JsonConvert.SerializeObject(normalReward, _settings);
+            string superRewardString = JsonConvert.SerializeObject(superReward, _settings);
+            string fallbackRewardString = JsonConvert.SerializeObject(fallbackReward, _settings);
+
+            Reward deserializedDefaultReward = JsonConvert.DeserializeObject<Reward>(defaultRewardString, _settings);
+            Reward deserializedNormalReward = JsonConvert.DeserializeObject<Reward>(normalRewardString, _settings);
+            Reward deserializedSuperReward = JsonConvert.DeserializeObject<Reward>(superRewardString, _settings);
+            Reward deserializedFallbackReward = JsonConvert.DeserializeObject<Reward>(fallbackRewardString, _settings);
+            
+            Assert.IsNotNull(deserializedDefaultReward);
+            Assert.IsNotNull(deserializedNormalReward);
+            Assert.IsNotNull(deserializedSuperReward);
+            Assert.IsNotNull(deserializedFallbackReward);
+            
+            Assert.IsNotNull(deserializedDefaultReward.RewardData);
+            Assert.IsNotNull(deserializedNormalReward.RewardData);
+            Assert.IsNotNull(deserializedSuperReward.RewardData);
+            Assert.IsNull(deserializedFallbackReward.RewardData);
+            
+            Assert.IsInstanceOf<RewardData>(deserializedDefaultReward.RewardData);
+            Assert.IsInstanceOf<NormalRewardData>(deserializedNormalReward.RewardData);
+            Assert.IsInstanceOf<SuperRewardData>(deserializedSuperReward.RewardData);
         }
         
         [Test]
@@ -131,6 +164,53 @@ namespace DysonCore.DynamicJson.Tests.Runtime
             Special
         }
 
+#endregion
+
+#region TestModels_Rewards
+
+        private class Reward
+        {
+            [TypifyingProperty]
+            [JsonProperty]
+            public string Type { get; private set; }
+
+            [JsonProperty("rewardData")] 
+            [TypifiedProperty]
+            public RewardData RewardData { get; private set; }
+
+            internal Reward(RewardData rewardData)
+            {
+                RewardData = rewardData;
+                Type = rewardData.Type;
+            }
+
+            internal Reward(string type)
+            {
+                Type = type;
+            }
+
+            internal Reward() { }
+        }
+
+        private class RewardData
+        {
+            [JsonIgnore]
+            [TypifyingProperty]
+            public virtual string Type => "default";
+        }
+
+        private class SuperRewardData : RewardData
+        {
+            [TypifyingProperty] 
+            public override string Type => "superRewardData";
+        }
+        
+        private class NormalRewardData : RewardData
+        {
+            [TypifyingProperty] 
+            public override string Type => "normalRewardData";
+        }
+    
 #endregion
     }
 }

@@ -4,7 +4,7 @@ using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace DysonCore.DynamicJson.PolymorphicConverter
+namespace DysonCore.DynamicJson.PolymorphicParser
 {
     /// <summary>
     /// Provides custom JSON deserialization for objects marked with <see cref="TypifiedPropertyAttribute"/> and <see cref="TypifyingPropertyAttribute"/>.
@@ -36,11 +36,14 @@ namespace DysonCore.DynamicJson.PolymorphicConverter
             _typesToIgnore.Value.Clear();
             JToken token = JToken.Load(reader);
             TypeLazyReference type = (TypeLazyReference)objectType;
+            object toReturn;
 
             if (!_baseToPropertyData.TryGetValue(type, out TypifyingPropertyData propertyData) || propertyData.ValuesData.Count <= 0)
             {
                 _typesToIgnore.Value.Add(objectType);
-                return token.ToObject(objectType, serializer);
+                toReturn =  token.ToObject(objectType, serializer);
+                _typesToIgnore.Value.Clear();
+                return toReturn;
             }
             
             JToken typifyingToken = token.SelectToken(propertyData.JsonName);
@@ -68,7 +71,9 @@ namespace DysonCore.DynamicJson.PolymorphicConverter
                 _typesToIgnore.Value.Add(implementer.Type);
             }
             
-            return token.ToObject(implementer.Type, serializer);
+            toReturn = token.ToObject(implementer.Type, serializer);
+            _typesToIgnore.Value.Clear();
+            return toReturn;
         }
 
         /// <summary>
@@ -86,7 +91,7 @@ namespace DysonCore.DynamicJson.PolymorphicConverter
             {
                 if (!currentJObject.TryGetValue(typifiedProperty.JsonName, out JToken valueToken))
                 {
-                    return null;
+                    continue;
                 }
                 
                 switch (valueToken)

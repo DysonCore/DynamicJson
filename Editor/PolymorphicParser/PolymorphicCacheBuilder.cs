@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DysonCore.DynamicJson.PolymorphicConverter;
+using DysonCore.DynamicJson.PolymorphicParser;
 using Newtonsoft.Json;
 
-namespace DysonCore.DynamicJson.Editor.PolymorphicConverter
+namespace DysonCore.DynamicJson.Editor.PolymorphicParser
 {
     /// <summary>
     /// Provides a centralized data provider for managing <see cref="PropertyData"/> mappings used by polymorphic converter.
@@ -50,7 +50,7 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicConverter
         /// </summary>
         /// <param name="propertyInfo">The PropertyInfo object representing the property to process.</param>
         /// <param name="classType">The Type of the class that the property belongs to.</param>
-        /// <exception cref="Exception">Throws the <see cref="Exception"/> if single property marked with both <see cref="TypifyingPropertyAttribute"/> and <see cref="TypifiedPropertyAttribute"/></exception>
+        /// <exception cref="Exception">Throws <see cref="Exception"/> if single property marked with both <see cref="TypifyingPropertyAttribute"/> and <see cref="TypifiedPropertyAttribute"/></exception>
         private static void ProcessProperty(Dictionary<TypeLazyReference, TypifyingPropertyData> baseToPropertyData, List<(TypeLazyReference abstractType, TypifyingPropertyData propertyData)> abstractDefiningData, Dictionary<TypeLazyReference, List<TypifiedPropertyData>> typifiedDefiningData, PropertyInfo propertyInfo, TypeLazyReference classType)
         {
             TypifyingPropertyAttribute typifyingAttribute = propertyInfo.GetCustomAttribute<TypifyingPropertyAttribute>();
@@ -115,6 +115,12 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicConverter
             //create an instance of non-abstract class and get the value of its property marked with TypifyingPropertyAttribute.
             object classInstance = Activator.CreateInstance(classType.Type, true);
             object propertyValue = propertyInfo.GetValue(classInstance);
+
+            if (propertyValue == null)
+            {
+                return;
+            }
+            
             //add to corresponding TypifyingPropertyData.
             propertyData.ValuesData[propertyValue] = classType;
         }
