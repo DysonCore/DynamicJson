@@ -1,3 +1,5 @@
+using System;
+
 namespace DysonCore.DynamicJson.PolymorphicParser
 {
     /// <summary>
@@ -6,8 +8,8 @@ namespace DysonCore.DynamicJson.PolymorphicParser
     /// </summary>
     internal class TypifiedPropertyData : PropertyData
     {
-        internal TypifiedPropertyData(TypeLazyReference propertyType, string propertyName, string jsonName) : base(propertyType, propertyName, jsonName)
-        {
-        }
+        internal TypifiedPropertyData(Type propertyType, string propertyName, string jsonName) : base(propertyType, propertyName, jsonName) { }
+
+        private TypifiedPropertyData() { }
     }
 }

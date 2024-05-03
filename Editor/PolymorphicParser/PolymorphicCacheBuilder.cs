@@ -13,16 +13,35 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
     /// </summary>
     internal static class PolymorphicCacheBuilder
     {
+        /// <summary>
+        /// Stores mappings from base types to their corresponding <see cref="TypifyingPropertyData"/>.
+        /// Used to resolve the correct type during JSON deserialization based on <see cref="TypifyingPropertyAttribute"/>.
+        /// </summary>
+        private static Dictionary<Type, TypifyingPropertyData> BaseToPropertyData { get; } = new ();
+        /// <summary>
+        /// Temporal list of tuples containing abstract types of secondary inheritance (when abstract class assigns value to the abstract property of base class) and associated <see cref="TypifyingPropertyData"/>.
+        /// Used to store additional data required for <see cref="PostProcessAbstractClasses"/>. Gets cleared when <see cref="GetData"/> is finished.
+        /// </summary>
+        private static readonly List<(Type abstractType, TypifyingPropertyData propertyData)> AbstractDefiningData = new ();
+        /// <summary>
+        /// Temporal dictionary of types to a list of <see cref="TypifiedPropertyData"/>, storing information for types that have been marked with <see cref="TypifiedPropertyAttribute"/>.
+        /// Used to store additional data required for <see cref="PostProcessTypifiedProperties"/>. Gets cleared when <see cref="GetData"/>> is finished.
+        /// </summary>
+        private static readonly Dictionary<Type, List<TypifiedPropertyData>> TypifiedDefiningData = new ();
+        /// <summary>
+        /// Indicates whether the PropertyDataProvider has been initialized, to prevent redundant initializations.
+        /// </summary>
+        private static bool _initialized;
         
         /// <summary>
-        /// Initializes the <see cref="PolymorphicCacheProvider"/> with data from the specified assemblies.
+        /// Initializes the <see cref="PolymorphicCacheBuilder"/> with data from the specified assemblies.
         /// Scans the provided assemblies to build the data mappings required for polymorphic deserialization.
         /// </summary>
-        internal static Dictionary<TypeLazyReference, TypifyingPropertyData> GetData()
+        internal static Dictionary<Type, TypifyingPropertyData> GetData()
         {
-            Dictionary<TypeLazyReference, TypifyingPropertyData> baseToPropertyData = new (); // Stores mappings from base types to their corresponding TypifyingPropertyData
-            List<(TypeLazyReference abstractType, TypifyingPropertyData propertyData)> abstractDefiningData = new (); // Temporal list of tuples containing abstract types of secondary inheritance (when abstract class assigns value to the abstract property of base class) and associated TypifyingPropertyData.
-            Dictionary<TypeLazyReference, List<TypifiedPropertyData>> typifiedDefiningData = new (); // Temporal dictionary of types to a list of TypifiedPropertyData, storing information for types that have been marked with TypifiedPropertyAttribute.
+            BaseToPropertyData.Clear();
+            AbstractDefiningData.Clear();
+            TypifiedDefiningData.Clear();
             
             Assembly[] assemblies = AssemblyUtils.GetPackageRuntimeAssembly().GetReferencingAssemblies();
             
@@ -32,17 +51,15 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
                 {
                     foreach (PropertyInfo propertyInfo in classType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
                     {
-                        ProcessProperty(baseToPropertyData, abstractDefiningData, typifiedDefiningData, propertyInfo, (TypeLazyReference)classType);
+                        ProcessProperty(propertyInfo, classType);
                     }
                 }
             }
 
-            PostProcessAbstractClasses(baseToPropertyData, abstractDefiningData);
-            PostProcessTypifiedProperties(baseToPropertyData, typifiedDefiningData);
-            
-            abstractDefiningData.Clear();
-            typifiedDefiningData.Clear();
-            return baseToPropertyData;
+            PostProcessAbstractClasses();
+            PostProcessTypifiedProperties();
+
+            return BaseToPropertyData;
         }
 
         /// <summary>
@@ -50,8 +67,8 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
         /// </summary>
         /// <param name="propertyInfo">The PropertyInfo object representing the property to process.</param>
         /// <param name="classType">The Type of the class that the property belongs to.</param>
-        /// <exception cref="Exception">Throws <see cref="Exception"/> if single property marked with both <see cref="TypifyingPropertyAttribute"/> and <see cref="TypifiedPropertyAttribute"/></exception>
-        private static void ProcessProperty(Dictionary<TypeLazyReference, TypifyingPropertyData> baseToPropertyData, List<(TypeLazyReference abstractType, TypifyingPropertyData propertyData)> abstractDefiningData, Dictionary<TypeLazyReference, List<TypifiedPropertyData>> typifiedDefiningData, PropertyInfo propertyInfo, TypeLazyReference classType)
+        /// <exception cref="Exception">Throws the <see cref="Exception"/> if single property marked with both <see cref="TypifyingPropertyAttribute"/> and <see cref="TypifiedPropertyAttribute"/></exception>
+        private static void ProcessProperty(PropertyInfo propertyInfo, Type classType)
         {
             TypifyingPropertyAttribute typifyingAttribute = propertyInfo.GetCustomAttribute<TypifyingPropertyAttribute>();
             TypifiedPropertyAttribute typifiedAttribute = propertyInfo.GetCustomAttribute<TypifiedPropertyAttribute>();
@@ -61,17 +78,17 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
 
             if (isTypifying && isTypified)
             {
-                throw new Exception($"[{nameof(PolymorphicCacheBuilder)}.{nameof(ProcessProperty)}] {classType.TypeName}.{propertyInfo.Name} property has {nameof(TypifyingPropertyAttribute)} and {nameof(TypifiedPropertyAttribute)} at the same time!");
+                throw new Exception($"[{nameof(PolymorphicCacheBuilder)}.{nameof(ProcessProperty)}] {classType.Name}.{propertyInfo.Name} property has {nameof(TypifyingPropertyAttribute)} and {nameof(TypifiedPropertyAttribute)} at the same time!");
             }
 
             if (isTypifying)
             {
-                ProcessTypifyingProperty(baseToPropertyData, abstractDefiningData, propertyInfo, classType, typifyingAttribute);
+                ProcessTypifyingProperty(propertyInfo, classType, typifyingAttribute);
             }
 
             if (isTypified)
             {
-                ProcessTypifiedProperty(typifiedDefiningData, propertyInfo, classType);
+                ProcessTypifiedProperty(propertyInfo, classType);
             }
         }
         
@@ -83,37 +100,37 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
         /// <param name="propertyInfo">The <see cref="PropertyInfo"/> object of the property with <see cref="TypifyingPropertyAttribute"/></param>
         /// <param name="classType">The Type of the class that contains the current property with <see cref="TypifyingPropertyAttribute"/>.</param>
         /// <param name="typifyingAttribute">The <see cref="TypifyingPropertyAttribute"/> applied to the property.</param>
-        private static void ProcessTypifyingProperty(Dictionary<TypeLazyReference, TypifyingPropertyData> baseToPropertyData, List<(TypeLazyReference abstractType, TypifyingPropertyData propertyData)> abstractDefiningData, PropertyInfo propertyInfo, TypeLazyReference classType, TypifyingPropertyAttribute typifyingAttribute)
+        private static void ProcessTypifyingProperty(PropertyInfo propertyInfo, Type classType, TypifyingPropertyAttribute typifyingAttribute)
         {
-            TypeLazyReference propertyType = (TypeLazyReference)propertyInfo.PropertyType;
+            Type propertyType = propertyInfo.PropertyType;
             JsonPropertyAttribute jsonProperty = propertyInfo.GetCustomAttribute<JsonPropertyAttribute>();
 
-            TypeLazyReference baseType = (TypeLazyReference)(typifyingAttribute.InheritanceRoot ?? classType.Type.GetDeclaringClass(propertyInfo.Name)); //get base declaring class for the current property. Manual declaration of root class is prioritized.  
-            TypifyingPropertyAttribute baseAttribute = baseType.Type.GetProperty(propertyInfo.Name)?.GetCustomAttribute<TypifyingPropertyAttribute>();
+            Type baseClass = typifyingAttribute.InheritanceRoot ?? classType.GetDeclaringClass(propertyInfo.Name); //get base declaring class for the current property. Manual declaration of root class is prioritized.  
+            TypifyingPropertyAttribute baseAttribute = baseClass.GetProperty(propertyInfo.Name)?.GetCustomAttribute<TypifyingPropertyAttribute>();
 
             if (baseAttribute == null)
             {
-                throw new Exception($"[{nameof(PolymorphicCacheBuilder)}.{nameof(ProcessTypifyingProperty)}] {baseType.TypeName} has no property with {nameof(TypifyingPropertyAttribute)} and \"{propertyInfo.Name}\" {nameof(propertyInfo.Name)}.\nReferencing class - {classType.TypeName}.");
+                throw new Exception($"[{nameof(PolymorphicCacheBuilder)}.{nameof(ProcessTypifyingProperty)}] {baseClass.Name} has no property with {nameof(TypifyingPropertyAttribute)} and \"{propertyInfo.Name}\" {nameof(propertyInfo.Name)}.\nReferencing class - {classType.FullName}.");
             }
 
-            if (!baseToPropertyData.TryGetValue(baseType, out TypifyingPropertyData propertyData)) //get or create TypifyingPropertyData from / in BaseToPropertyData.
+            if (!BaseToPropertyData.TryGetValue(baseClass, out TypifyingPropertyData propertyData)) //get or create TypifyingPropertyData from / in BaseToPropertyData.
             {
-                propertyData = new TypifyingPropertyData(propertyType, propertyInfo.Name, jsonProperty?.PropertyName, baseAttribute);
-                baseToPropertyData[baseType] = propertyData;
+                propertyData = new TypifyingPropertyData(propertyType, propertyInfo.Name, jsonProperty?.PropertyName);
+                BaseToPropertyData[baseClass] = propertyData;
             }
 
-            if (classType.Type.IsAbstract) //if class is abstract - its impossible to create instance of it, so
+            if (classType.IsAbstract) //if class is abstract - its impossible to create instance of it, so
             {
-                if (classType.Equals(baseType)) //if current class is abstract class, and current class is not a class which defines current TypifyingProperty -> add this class to the list of abstract classes for post-processing. 
+                if (classType != baseClass) //if current class is abstract class, and current class is not a class which defines current TypifyingProperty -> add this class to the list of abstract classes for post-processing. 
                 {
-                    abstractDefiningData.Add((classType, propertyData));
+                    AbstractDefiningData.Add((classType, propertyData));
                 }
 
                 return;
             }
 
             //create an instance of non-abstract class and get the value of its property marked with TypifyingPropertyAttribute.
-            object classInstance = Activator.CreateInstance(classType.Type, true);
+            object classInstance = Activator.CreateInstance(classType, true);
             object propertyValue = propertyInfo.GetValue(classInstance);
 
             if (propertyValue == null)
@@ -132,15 +149,15 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
         /// </summary>
         /// <param name="propertyInfo">The <see cref="PropertyInfo"/> object of the property with <see cref="TypifiedPropertyAttribute"/>.</param>
         /// <param name="classType">The Type of the class that contains the the property with <see cref="TypifiedPropertyAttribute"/>.</param>
-        private static void ProcessTypifiedProperty(Dictionary<TypeLazyReference, List<TypifiedPropertyData>> typifiedDefiningData, PropertyInfo propertyInfo, TypeLazyReference classType)
+        private static void ProcessTypifiedProperty(PropertyInfo propertyInfo, Type classType)
         {
-            TypeLazyReference propertyType = (TypeLazyReference)propertyInfo.PropertyType;
+            Type propertyType = propertyInfo.PropertyType;
             JsonPropertyAttribute jsonProperty = propertyInfo.GetCustomAttribute<JsonPropertyAttribute>();
             
-            if (!typifiedDefiningData.TryGetValue(classType, out List<TypifiedPropertyData> propertyData))
+            if (!TypifiedDefiningData.TryGetValue(classType, out List<TypifiedPropertyData> propertyData))
             {
                 propertyData = new List<TypifiedPropertyData>();
-                typifiedDefiningData[classType] = propertyData;
+                TypifiedDefiningData[classType] = propertyData;
             }
 
             TypifiedPropertyData data = new TypifiedPropertyData(propertyType, propertyInfo.Name, jsonProperty.PropertyName);
@@ -148,21 +165,21 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
         }
 
         /// <summary>
-        /// Iterates through <see cref="abstractDefiningData"/> and establishes the mapping between abstract classes and their <see cref="TypifyingPropertyAttribute"/> value.
+        /// Iterates through <see cref="AbstractDefiningData"/> and establishes the mapping between abstract classes and their <see cref="TypifyingPropertyAttribute"/> value.
         /// This method is crucial for enabling polymorphic deserialization where abstract types of secondary inheritance (abstract class assigns value to the base abstract property) need to be resolved
         /// to their concrete implementations.
         /// </summary>
-        private static void PostProcessAbstractClasses(Dictionary<TypeLazyReference, TypifyingPropertyData> baseToPropertyData, List<(TypeLazyReference abstractType, TypifyingPropertyData propertyData)> abstractDefiningData)
+        private static void PostProcessAbstractClasses()
         {
-            foreach ((TypeLazyReference abstractType, TypifyingPropertyData propertyData) data in abstractDefiningData)
+            foreach (var data in AbstractDefiningData)
             {
-                if(!baseToPropertyData.TryGetValue(data.abstractType, out TypifyingPropertyData propertyData))
+                if(!BaseToPropertyData.TryGetValue(data.abstractType, out TypifyingPropertyData propertyData))
                 {
                     continue;
                 }
                 
-                TypeLazyReference implementingClass = propertyData.ValuesData.Values.FirstOrDefault(typeWrapper => !typeWrapper.Type.IsAbstract);
-                PropertyInfo propertyInfo = implementingClass?.Type.GetProperty(data.propertyData.PropertyName);
+                Type implementingClass = propertyData.ValuesData.Values.FirstOrDefault(type => !type.IsAbstract);
+                PropertyInfo propertyInfo = implementingClass?.GetProperty(data.propertyData.PropertyName);
 
                 if (propertyInfo is null)
                 {
@@ -170,7 +187,7 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
                 }
                 
                 //create an instance of non-abstract class and get the value of its property marked with TypifyingPropertyAttribute.
-                object classObject = Activator.CreateInstance(implementingClass.Type, true);
+                object classObject = Activator.CreateInstance(implementingClass, true);
                 object value = propertyInfo.GetValue(classObject);
                 //add to corresponding TypifyingPropertyData.
                 data.propertyData.ValuesData[value] = data.abstractType;
@@ -178,14 +195,14 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
         }
 
         /// <summary>
-        /// Finalizes the processing of <see cref="TypifiedPropertyAttribute"/> by incorporating them into the <see cref="baseToPropertyData"/>.
+        /// Finalizes the processing of <see cref="TypifiedPropertyAttribute"/> by incorporating them into the <see cref="BaseToPropertyData"/>.
         /// This method finds corresponding <see cref="TypifyingPropertyData"/> for all <see cref="TypifiedPropertyAttribute"/>s and adds them in. 
         /// </summary>
-        private static void PostProcessTypifiedProperties(Dictionary<TypeLazyReference, TypifyingPropertyData> baseToPropertyData, Dictionary<TypeLazyReference, List<TypifiedPropertyData>> typifiedDefiningData)
+        private static void PostProcessTypifiedProperties()
         {
-            foreach (KeyValuePair<TypeLazyReference, List<TypifiedPropertyData>> data in typifiedDefiningData)
+            foreach (var data in TypifiedDefiningData)
             {
-                if (!baseToPropertyData.TryGetValue(data.Key, out TypifyingPropertyData propertyData))
+                if (!BaseToPropertyData.TryGetValue(data.Key, out TypifyingPropertyData propertyData))
                 {
                     continue;
                 }

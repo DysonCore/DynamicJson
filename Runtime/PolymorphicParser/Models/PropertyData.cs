@@ -1,3 +1,4 @@
+using System;
 using Newtonsoft.Json;
 
 namespace DysonCore.DynamicJson.PolymorphicParser
@@ -9,19 +10,21 @@ namespace DysonCore.DynamicJson.PolymorphicParser
     internal abstract class PropertyData
     {
         [JsonProperty("propertyType")]
-        internal TypeLazyReference PropertyType { get; }
+        internal Type PropertyType { get; private set; }
         
         [JsonProperty("name")]
-        internal string PropertyName { get; }
+        internal string PropertyName { get; private set; }
         
         [JsonProperty("jsonName")]
-        internal string JsonName { get; }
+        internal string JsonName { get; private set; }
 
-        protected PropertyData(TypeLazyReference propertyType, string propertyName, string jsonName)
+        protected internal PropertyData(Type propertyType, string propertyName, string jsonName)
         {
             PropertyType = propertyType;
             PropertyName = propertyName;
             JsonName = string.IsNullOrWhiteSpace(jsonName) ? propertyName : jsonName;
         }
+
+        protected internal PropertyData() { }
     }
 }

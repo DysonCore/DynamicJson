@@ -4,16 +4,16 @@ using Newtonsoft.Json.Linq;
 
 namespace DysonCore.DynamicJson.PolymorphicParser
 {
-    internal sealed class TypeLazyReferenceConverter : JsonConverter
+    internal sealed class TypeConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (value is not TypeLazyReference lazyReference)
+            if (value is not Type type)
             {
                 return;
             }
             
-            string serializedValue = lazyReference.TypeName;
+            string serializedValue = type.AssemblyQualifiedName;
             writer.WriteValue(serializedValue);
         }
 
@@ -21,13 +21,13 @@ namespace DysonCore.DynamicJson.PolymorphicParser
         {
             JToken token = JToken.Load(reader);
             string typeName = token.ToObject<string>();
-            TypeLazyReference lazyReference = new TypeLazyReference(typeName);
-            return lazyReference;
+            Type type = Type.GetType(typeName);
+            return type;
         }
 
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(TypeLazyReference);
+            return objectType == typeof(Type);
         }
     }
 }

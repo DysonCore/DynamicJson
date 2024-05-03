@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
@@ -10,14 +11,17 @@ namespace DysonCore.DynamicJson.PolymorphicParser
     internal class TypifyingPropertyData : PropertyData
     {
         [JsonProperty("valuesData")]
-        internal Dictionary<object, TypeLazyReference> ValuesData { get; }
+        internal Dictionary<object, Type> ValuesData { get; private set; }
+        
         [JsonProperty("typifiedProperties")]
-        internal List<TypifiedPropertyData> TypifiedProperties { get; }
+        internal List<TypifiedPropertyData> TypifiedProperties { get; private set; }
 
-        internal TypifyingPropertyData(TypeLazyReference propertyType, string propertyName, string jsonName, TypifyingPropertyAttribute baseTypifyingAttribute) : base(propertyType, propertyName, jsonName)
+        internal TypifyingPropertyData(Type propertyType, string propertyName, string jsonName) : base(propertyType, propertyName, jsonName)
         {
-            ValuesData = new Dictionary<object, TypeLazyReference>();
+            ValuesData = new Dictionary<object, Type>();
             TypifiedProperties = new List<TypifiedPropertyData>();
         }
+
+        private TypifyingPropertyData() { }
     }
 }

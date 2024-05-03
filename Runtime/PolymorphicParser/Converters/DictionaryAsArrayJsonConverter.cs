@@ -26,7 +26,10 @@ internal sealed class DictionaryAsArrayJsonConverter : JsonConverter
     public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
         if (!CanConvert(objectType))
-            throw new Exception(string.Format("This converter is not for {0}.", objectType));
+        {
+            throw new Exception($"This converter is not for {objectType}.");
+        }
+            
 
         Type keyType = null;
         Type valueType = null;
@@ -50,20 +53,24 @@ internal sealed class DictionaryAsArrayJsonConverter : JsonConverter
         int depth = reader.Depth;
         while (reader.Read())
         {
-            if (reader.TokenType == JsonToken.StartArray)
+            switch (reader.TokenType)
             {
-            }
-            else if (reader.TokenType == JsonToken.EndArray)
-            {
-                if (reader.Depth == depth)
-                    return result;
-            }
-            else
-            {
-                object key = serializer.Deserialize(reader, keyType);
-                reader.Read();
-                object value = serializer.Deserialize(reader, valueType);
-                result.Add(key, value);
+                case JsonToken.StartArray:
+                    break;
+                case JsonToken.EndArray:
+                {
+                    if (reader.Depth == depth)
+                        return result;
+                    break;
+                }
+                default:
+                {
+                    object key = serializer.Deserialize(reader, keyType);
+                    reader.Read();
+                    object value = serializer.Deserialize(reader, valueType);
+                    result.Add(key, value);
+                    break;
+                }
             }
         }
 
