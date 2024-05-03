@@ -1,13 +1,16 @@
 using System;
+using System.Collections.Concurrent;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
-namespace DysonCore.DynamicJson.SafeStringEnumConverter
+namespace DysonCore.DynamicJson.SafeStringEnumParser
 {
     public sealed class SafeStringEnumConverter : StringEnumConverter
     {
+        private static readonly ConcurrentDictionary<Type, object> DefaultsMap = new ();
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="SafeStringEnumConverter"/> class.
         /// Mirrors <see cref="StringEnumConverter"/>'s constructor.
@@ -18,7 +21,7 @@ namespace DysonCore.DynamicJson.SafeStringEnumConverter
         /// Initializes a new instance of the <see cref="SafeStringEnumConverter"/> class with a flag indicating whether enum values are written as camel case.
         /// Mirrors <see cref="StringEnumConverter"/>'s constructor.
         /// </summary>
-        /// <param name="camelCaseText">true to write enum values as camel case; false to write them as they are defined.</param>
+        /// <param name="camelCaseText"><c>true</c> to write enum values as camel case; <c>false</c> to write them as they are defined.</param>
         [Obsolete("StringEnumConverter(bool) base constructor is obsolete. Create a converter with SafeStringEnumConverter(NamingStrategy, bool) instead.")]
         public SafeStringEnumConverter(bool camelCaseText) : base(camelCaseText) { }
 
@@ -68,21 +71,30 @@ namespace DysonCore.DynamicJson.SafeStringEnumConverter
         /// <summary>
         /// Gets the default value of the enum type specified using <see cref="DefaultEnumValueAttribute"/>.
         /// </summary>
-        /// <param name="enumType">Type of the enum.</param>
+        /// <param name="type">Type of the enum.</param>
         /// <returns>The default enum value, or null if none is found.</returns>
-        private object GetDefaultValue(Type enumType)
+        private object GetDefaultValue(Type type)
         {
-            Type actualEnumType = Nullable.GetUnderlyingType(enumType) ?? enumType; //used to support nullable enums
-            
-            foreach (FieldInfo field in actualEnumType.GetFields())
+            Type actualType = Nullable.GetUnderlyingType(type) ?? type; //is used to support nullable enums
+
+            if(DefaultsMap.TryGetValue(actualType, out object value))
             {
-                if (field.GetCustomAttribute<DefaultEnumValueAttribute>() != null)
-                {
-                    return Enum.Parse(actualEnumType, field.Name);
-                }
+                return value;
             }
             
-            return null;
+            foreach (FieldInfo field in actualType.GetFields())
+            {
+                if (field.GetCustomAttribute<DefaultEnumValueAttribute>() == null)
+                {
+                    continue;
+                }
+                
+                value = Enum.Parse(actualType, field.Name);
+                DefaultsMap[actualType] = value;
+                break;
+            }
+            
+            return value;
         }
     }
 }

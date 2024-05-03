@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using DysonCore.DynamicJson.PolymorphicParser;
-using DysonCore.DynamicJson.SafeStringEnumConverter;
+using DysonCore.DynamicJson.SafeStringEnumParser;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -17,7 +17,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime
         {
             _settings = new JsonSerializerSettings();
             _settings.Converters.Add(new PolymorphicConverter());
-            _settings.Converters.Add(new SafeStringEnumConverter.SafeStringEnumConverter(new CamelCaseNamingStrategy { OverrideSpecifiedNames = false }));
+            _settings.Converters.Add(new SafeStringEnumConverter(new CamelCaseNamingStrategy { OverrideSpecifiedNames = false }));
         }
 
         [Test]
