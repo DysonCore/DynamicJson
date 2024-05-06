@@ -48,7 +48,7 @@ namespace DysonCore.DynamicJson.PolymorphicParser
             JToken typifyingToken = token.SelectToken(propertyData.JsonName);
             object value = typifyingToken?.ToObject(propertyData.PropertyType, serializer);
 
-            if (value is null || !propertyData.ValuesData.TryGetValue(value, out Type implementer))
+            if (value is null || !propertyData.ValuesData.TryGetValue(typifyingToken, out Type implementer))
             {
                 if (propertyData.TypifiedProperties.Count <= 0)
                 {

@@ -28,10 +28,6 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
         /// Used to store additional data required for <see cref="PostProcessTypifiedProperties"/>. Gets cleared when <see cref="GetData"/>> is finished.
         /// </summary>
         private static readonly Dictionary<Type, List<TypifiedPropertyData>> TypifiedDefiningData = new ();
-        /// <summary>
-        /// Indicates whether the PropertyDataProvider has been initialized, to prevent redundant initializations.
-        /// </summary>
-        private static bool _initialized;
         
         /// <summary>
         /// Initializes the <see cref="PolymorphicCacheBuilder"/> with data from the specified assemblies.

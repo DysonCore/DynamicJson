@@ -10,9 +10,9 @@ namespace DysonCore.DynamicJson.PolymorphicParser
     /// </summary>
     internal class TypifyingPropertyData : PropertyData
     {
-        [JsonProperty("valuesData")]
+        [JsonProperty("valuesData")] 
         internal Dictionary<object, Type> ValuesData { get; private set; }
-        
+
         [JsonProperty("typifiedProperties")]
         internal List<TypifiedPropertyData> TypifiedProperties { get; private set; }
 

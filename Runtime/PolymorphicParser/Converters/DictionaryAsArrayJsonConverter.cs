@@ -7,17 +7,23 @@ internal sealed class DictionaryAsArrayJsonConverter : JsonConverter
 {
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
-        var dictionary = (IDictionary)value;
+        if (value is not IDictionary dictionary)
+        {
+            throw new Exception($"[{nameof(DictionaryAsArrayJsonConverter)}.{nameof(WriteJson)}] cant write {nameof(value)} which is not {nameof(IDictionary)}.");
+        }
 
         writer.WriteStartArray();
 
-        var en = dictionary.GetEnumerator();
-        while (en.MoveNext())
+        IDictionaryEnumerator enumerator = dictionary.GetEnumerator();
+        using (enumerator as IDisposable)
         {
-            writer.WriteStartArray();
-            serializer.Serialize(writer, en.Key);
-            serializer.Serialize(writer, en.Value);
-            writer.WriteEndArray();
+            while (enumerator.MoveNext())
+            {
+                writer.WriteStartArray();
+                serializer.Serialize(writer, enumerator.Key);
+                serializer.Serialize(writer, enumerator.Value);
+                writer.WriteEndArray();
+            }
         }
         
         writer.WriteEndArray();
@@ -25,30 +31,25 @@ internal sealed class DictionaryAsArrayJsonConverter : JsonConverter
 
     public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
-        if (!CanConvert(objectType))
-        {
-            throw new Exception($"This converter is not for {objectType}.");
-        }
-            
-
         Type keyType = null;
         Type valueType = null;
+        Type actualType = objectType;
         IDictionary result;
 
         if (objectType.IsGenericType)
         {
             keyType = objectType.GetGenericArguments()[0];
             valueType = objectType.GetGenericArguments()[1];
-            var dictionaryType = typeof(Dictionary<,>).MakeGenericType(keyType, valueType);
-            result = (IDictionary)Activator.CreateInstance(dictionaryType);
+            actualType = typeof(Dictionary<,>).MakeGenericType(keyType, valueType);
         }
-        else
-        {
-            result = (IDictionary)Activator.CreateInstance(objectType);
-        }
+        
+        result = (IDictionary)Activator.CreateInstance(actualType);
 
         if (reader.TokenType == JsonToken.Null)
+        {
             return null;
+        }
+            
 
         int depth = reader.Depth;
         while (reader.Read())
@@ -60,7 +61,10 @@ internal sealed class DictionaryAsArrayJsonConverter : JsonConverter
                 case JsonToken.EndArray:
                 {
                     if (reader.Depth == depth)
+                    {
                         return result;
+                    }
+                        
                     break;
                 }
                 default:
@@ -68,7 +72,11 @@ internal sealed class DictionaryAsArrayJsonConverter : JsonConverter
                     object key = serializer.Deserialize(reader, keyType);
                     reader.Read();
                     object value = serializer.Deserialize(reader, valueType);
-                    result.Add(key, value);
+                    
+                    if (key != null)
+                    {
+                        result.Add(key, value);
+                    }
                     break;
                 }
             }
@@ -81,5 +89,4 @@ internal sealed class DictionaryAsArrayJsonConverter : JsonConverter
     {
         return typeof(IDictionary).IsAssignableFrom(objectType);
     }
-
 }
