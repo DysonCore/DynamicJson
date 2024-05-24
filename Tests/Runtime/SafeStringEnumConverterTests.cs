@@ -45,6 +45,30 @@ namespace DysonCore.DynamicJson.Tests.Runtime
         }
         
         [Test]
+        public void DeserializeNullableEnums_CompletesSuccessfully()
+        {
+            List<Apple> appleList = new List<Apple>
+            {
+                new Apple(AppleVariety.Fuji), 
+                new Apple(AppleVariety.HoneyCrisp), 
+                new Apple(AppleVariety.Regular)
+            };
+
+            string appleListString = JsonConvert.SerializeObject(appleList, _settings);
+
+            List<Apple> deserializedAppleList = JsonConvert.DeserializeObject<List<Apple>>(appleListString, _settings);
+            
+            Assert.IsNotNull(deserializedAppleList);
+            Assert.IsTrue(deserializedAppleList.Count == appleList.Count);
+
+            for (int i = 0; i < deserializedAppleList.Count; i++)
+            {
+                Assert.IsNotNull(deserializedAppleList[i]);
+                Assert.AreEqual(appleList[i].Variety, deserializedAppleList[i].Variety);
+            }
+        }
+        
+        [Test]
         public void DeserializeEnumsWithWrongValue_CompletesSuccessfully()
         {
             List<Food> foodList = new List<Food>
@@ -176,6 +200,32 @@ namespace DysonCore.DynamicJson.Tests.Runtime
             [TypifyingProperty]
             public override Food FoodType => Food.Unknown;
         }
+
+#endregion
+
+#region TestModels_NullableEnum  
+        
+        private enum AppleVariety
+        {
+            [DefaultEnumValue]
+            Regular,
+            Fuji,
+            HoneyCrisp,
+            PinkLady
+        }
+
+        private class Apple
+        {
+            [JsonProperty("variety")]
+            public AppleVariety? Variety { get; private set; }
+
+            internal Apple(AppleVariety variety)
+            {
+                Variety = variety;
+            }
+            
+            internal Apple() { }
+        } 
 
 #endregion
     }
