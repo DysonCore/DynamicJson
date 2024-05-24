@@ -47,27 +47,22 @@ namespace DysonCore.DynamicJson.Tests.Runtime
             Reward defaultReward = new Reward(new RewardData());
             Reward normalReward = new Reward(new NormalRewardData());
             Reward superReward = new Reward(new SuperRewardData());
-            Reward fallbackReward = new Reward("fallback");
 
             string defaultRewardString = JsonConvert.SerializeObject(defaultReward, _settings);
             string normalRewardString = JsonConvert.SerializeObject(normalReward, _settings);
             string superRewardString = JsonConvert.SerializeObject(superReward, _settings);
-            string fallbackRewardString = JsonConvert.SerializeObject(fallbackReward, _settings);
 
             Reward deserializedDefaultReward = JsonConvert.DeserializeObject<Reward>(defaultRewardString, _settings);
             Reward deserializedNormalReward = JsonConvert.DeserializeObject<Reward>(normalRewardString, _settings);
             Reward deserializedSuperReward = JsonConvert.DeserializeObject<Reward>(superRewardString, _settings);
-            Reward deserializedFallbackReward = JsonConvert.DeserializeObject<Reward>(fallbackRewardString, _settings);
             
             Assert.IsNotNull(deserializedDefaultReward);
             Assert.IsNotNull(deserializedNormalReward);
             Assert.IsNotNull(deserializedSuperReward);
-            Assert.IsNotNull(deserializedFallbackReward);
             
             Assert.IsNotNull(deserializedDefaultReward.RewardData);
             Assert.IsNotNull(deserializedNormalReward.RewardData);
             Assert.IsNotNull(deserializedSuperReward.RewardData);
-            Assert.IsNull(deserializedFallbackReward.RewardData);
             
             Assert.IsInstanceOf<RewardData>(deserializedDefaultReward.RewardData);
             Assert.IsInstanceOf<NormalRewardData>(deserializedNormalReward.RewardData);

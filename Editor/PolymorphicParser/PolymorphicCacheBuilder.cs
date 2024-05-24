@@ -17,7 +17,7 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
         /// Stores mappings from base types to their corresponding <see cref="TypifyingPropertyData"/>.
         /// Used to resolve the correct type during JSON deserialization based on <see cref="TypifyingPropertyAttribute"/>.
         /// </summary>
-        private static Dictionary<Type, TypifyingPropertyData> BaseToPropertyData { get; } = new ();
+        private static readonly Dictionary<Type, TypifyingPropertyData> BaseToPropertyData = new ();
         /// <summary>
         /// Temporal list of tuples containing abstract types of secondary inheritance (when abstract class assigns value to the abstract property of base class) and associated <see cref="TypifyingPropertyData"/>.
         /// Used to store additional data required for <see cref="PostProcessAbstractClasses"/>. Gets cleared when <see cref="GetData"/> is finished.
@@ -33,7 +33,7 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
         /// Initializes the <see cref="PolymorphicCacheBuilder"/> with data from the specified assemblies.
         /// Scans the provided assemblies to build the data mappings required for polymorphic deserialization.
         /// </summary>
-        internal static Dictionary<Type, TypifyingPropertyData> GetData()
+        internal static PolymorphicCache GetData()
         {
             BaseToPropertyData.Clear();
             AbstractDefiningData.Clear();
@@ -55,7 +55,8 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
             PostProcessAbstractClasses();
             PostProcessTypifiedProperties();
 
-            return BaseToPropertyData;
+            PolymorphicCache cache = new PolymorphicCache(BaseToPropertyData);
+            return cache;
         }
 
         /// <summary>
@@ -63,7 +64,7 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
         /// </summary>
         /// <param name="propertyInfo">The PropertyInfo object representing the property to process.</param>
         /// <param name="classType">The Type of the class that the property belongs to.</param>
-        /// <exception cref="Exception">Throws the <see cref="Exception"/> if single property marked with both <see cref="TypifyingPropertyAttribute"/> and <see cref="TypifiedPropertyAttribute"/></exception>
+        /// <exception cref="Exception">Throws <see cref="Exception"/> if single property marked with both <see cref="TypifyingPropertyAttribute"/> and <see cref="TypifiedPropertyAttribute"/></exception>
         private static void ProcessProperty(PropertyInfo propertyInfo, Type classType)
         {
             TypifyingPropertyAttribute typifyingAttribute = propertyInfo.GetCustomAttribute<TypifyingPropertyAttribute>();

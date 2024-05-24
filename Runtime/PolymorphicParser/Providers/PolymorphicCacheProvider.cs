@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using DysonCore.DynamicJson.SafeStringEnumParser;
@@ -9,9 +8,9 @@ namespace DysonCore.DynamicJson.PolymorphicParser
 {
     internal static class PolymorphicCacheProvider
     {
-        private static Dictionary<Type, TypifyingPropertyData> _data;
+        private static PolymorphicCache _data;
         
-        internal static Dictionary<Type, TypifyingPropertyData> GetData()
+        internal static PolymorphicCache GetData()
         {
             if (_data != null)
             {
@@ -22,9 +21,9 @@ namespace DysonCore.DynamicJson.PolymorphicParser
             
             List<JsonConverter> converters = new List<JsonConverter>
             {
-                new DictionaryAsArrayJsonConverter(),
                 new TypeConverter(),
-                new SafeStringEnumConverter()
+                new SafeStringEnumConverter(),
+                new TypifyingPropertyConverter()
             };
 
             JsonSerializerSettings settings = new JsonSerializerSettings
@@ -32,8 +31,8 @@ namespace DysonCore.DynamicJson.PolymorphicParser
                 Converters = converters
             };
 
-            TextAsset jsonTextFile = Resources.Load<TextAsset>(filePath);
-            _data = JsonConvert.DeserializeObject<Dictionary<Type, TypifyingPropertyData>>(jsonTextFile.text, settings);
+            TextAsset jsonTextAsset = Resources.Load<TextAsset>(filePath);
+            _data = JsonConvert.DeserializeObject<PolymorphicCache>(jsonTextAsset.text, settings);
             
             return _data;
         }

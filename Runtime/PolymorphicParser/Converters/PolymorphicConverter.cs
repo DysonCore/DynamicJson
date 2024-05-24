@@ -11,8 +11,10 @@ namespace DysonCore.DynamicJson.PolymorphicParser
     /// </summary>
     public sealed class PolymorphicConverter : JsonConverter
     {
-        private readonly Dictionary<Type, TypifyingPropertyData> _baseToPropertyData;
+        private readonly PolymorphicCache _polymorphicCache;
         private readonly ThreadLocal<List<Type>> _typesToIgnore = new (() => new List<Type>());
+        
+        private Dictionary<Type, TypifyingPropertyData> BaseToPropertyData => _polymorphicCache.Data;
 
         private UnknownTypeHandling UnknownTypeHandling { get; }
         
@@ -24,7 +26,7 @@ namespace DysonCore.DynamicJson.PolymorphicParser
         public PolymorphicConverter(UnknownTypeHandling unknownTypeHandling = UnknownTypeHandling.ThrowError)
         {
             UnknownTypeHandling = unknownTypeHandling;
-            _baseToPropertyData = PolymorphicCacheProvider.GetData();
+            _polymorphicCache = PolymorphicCacheProvider.GetData();
         }
 
         /// <summary>
@@ -37,10 +39,10 @@ namespace DysonCore.DynamicJson.PolymorphicParser
             JToken token = JToken.Load(reader);
             object toReturn;
 
-            if (!_baseToPropertyData.TryGetValue(objectType, out TypifyingPropertyData propertyData) || propertyData.ValuesData.Count <= 0)
+            if (!BaseToPropertyData.TryGetValue(objectType, out TypifyingPropertyData propertyData))
             {
                 _typesToIgnore.Value.Add(objectType);
-                toReturn =  token.ToObject(objectType, serializer);
+                toReturn = token.ToObject(objectType, serializer);
                 _typesToIgnore.Value.Clear();
                 return toReturn;
             }
@@ -48,9 +50,9 @@ namespace DysonCore.DynamicJson.PolymorphicParser
             JToken typifyingToken = token.SelectToken(propertyData.JsonName);
             object value = typifyingToken?.ToObject(propertyData.PropertyType, serializer);
 
-            if (value is null || !propertyData.ValuesData.TryGetValue(typifyingToken, out Type implementer))
+            if (value is null || !propertyData.ValuesData.TryGetValue(value, out Type implementer))
             {
-                if (propertyData.TypifiedProperties.Count <= 0)
+                if (propertyData.TypifiedProperties.IsNullOrEmpty())
                 {
                     switch (UnknownTypeHandling)
                     {
@@ -81,7 +83,7 @@ namespace DysonCore.DynamicJson.PolymorphicParser
         /// <returns><see cref="JToken"/> with typifying token added to the corresponding members.</returns>
         private JToken TypifyTokenMembers(JToken currentToken, JToken typifyingToken, TypifyingPropertyData propertyData)
         {
-            if (propertyData.TypifiedProperties.Count <= 0 || currentToken is not JObject currentJObject)
+            if (propertyData.TypifiedProperties.IsNullOrEmpty() || currentToken is not JObject currentJObject)
             {
                 return currentToken;
             }
@@ -121,7 +123,7 @@ namespace DysonCore.DynamicJson.PolymorphicParser
         /// <returns>True if the type can be converted; otherwise, false.</returns>
         public override bool CanConvert(Type objectType)
         {
-            return _baseToPropertyData.ContainsKey(objectType) && !_typesToIgnore.Value.Contains(objectType);
+            return BaseToPropertyData.ContainsKey(objectType) && !_typesToIgnore.Value.Contains(objectType);
         }
 
         /// <inheritdoc />

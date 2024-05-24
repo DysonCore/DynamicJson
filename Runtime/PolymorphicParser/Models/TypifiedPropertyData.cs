@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json;
 
 namespace DysonCore.DynamicJson.PolymorphicParser
 {
@@ -8,8 +9,10 @@ namespace DysonCore.DynamicJson.PolymorphicParser
     /// </summary>
     internal class TypifiedPropertyData : PropertyData
     {
-        internal TypifiedPropertyData(Type propertyType, string propertyName, string jsonName) : base(propertyType, propertyName, jsonName) { }
+        internal TypifiedPropertyData(Type propertyType, string propertyName, string jsonName) 
+            : base(propertyType, propertyName, jsonName) { }
 
+        [JsonConstructor]
         private TypifiedPropertyData() { }
     }
 }

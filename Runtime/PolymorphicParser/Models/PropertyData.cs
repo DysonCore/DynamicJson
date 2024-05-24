@@ -10,13 +10,13 @@ namespace DysonCore.DynamicJson.PolymorphicParser
     internal abstract class PropertyData
     {
         [JsonProperty("propertyType")]
-        internal Type PropertyType { get; private set; }
+        public Type PropertyType { get; protected set; }
         
         [JsonProperty("name")]
-        internal string PropertyName { get; private set; }
+        public string JsonName { get; protected set; }
         
-        [JsonProperty("jsonName")]
-        internal string JsonName { get; private set; }
+        [JsonIgnore]
+        public string PropertyName { get; protected set; }
 
         protected internal PropertyData(Type propertyType, string propertyName, string jsonName)
         {
@@ -25,6 +25,7 @@ namespace DysonCore.DynamicJson.PolymorphicParser
             JsonName = string.IsNullOrWhiteSpace(jsonName) ? propertyName : jsonName;
         }
 
+        [JsonConstructor]
         protected internal PropertyData() { }
     }
 }

@@ -40,9 +40,9 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
         {
             List<JsonConverter> converters = new List<JsonConverter>
             {
-                new DictionaryAsArrayJsonConverter(),
                 new TypeConverter(),
-                new SafeStringEnumConverter()
+                new SafeStringEnumConverter(),
+                new TypifyingPropertyConverter()
             };
             
             JsonSerializerSettings settings = new JsonSerializerSettings()
