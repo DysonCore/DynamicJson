@@ -9,27 +9,37 @@ namespace DysonCore.DynamicJson.InjectionConverter
 
         internal static void AddProvider(IInjectionDataProvider provider)
         {
-            if (provider is null)
+            if (provider == null)
             {
                 return;
             }
 
-            ModelToProviderData.TryAdd(provider.ValueType, provider);
+            if (ModelToProviderData.TryAdd(provider.IdentifierType, provider) is false)
+            {
+                throw new Exception($"[{nameof(ProviderRegistry)}.{nameof(AddProvider)}] Instance of {provider.GetType().Name} already exists. Use only one instance!");
+            }
         }
         
         internal static void RemoveProvider(IInjectionDataProvider provider)
         {
-            if (provider is null)
+            if (provider == null)
             {
                 return;
             }
 
-            ModelToProviderData.TryRemove(provider.ValueType, out _);
+            ModelToProviderData.TryRemove(provider.IdentifierType, out _);
         }
 
-        internal static bool TryGetProvider(Type key, out IInjectionDataProvider provider)
+        internal static IInjectionDataProvider GetProvider(Type modelType)
         {
-            return ModelToProviderData.TryGetValue(key, out provider);
+            ModelToProviderData.TryGetValue(modelType, out IInjectionDataProvider provider);
+
+            if (provider == null)
+            {
+                throw new Exception($"[{nameof(ProviderRegistry)}.{nameof(GetProvider)}] Instance with {nameof(modelType)} {modelType.Name} can not be found. Make sure {nameof(IInjectionDataProvider)} with given {nameof(modelType)} is initialized before deserialization!");
+            }
+
+            return provider;
         }
     }
 }

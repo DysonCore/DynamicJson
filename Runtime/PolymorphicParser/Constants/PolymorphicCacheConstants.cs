@@ -1,6 +1,6 @@
 namespace DysonCore.DynamicJson.PolymorphicParser
 {
-    public class PolymorphicCacheConstants
+    internal static class PolymorphicCacheConstants
     {
         internal const string ResourcesDirectoryName = "Resources";
         internal const string CacheDirectoryName = "DynamicJson";

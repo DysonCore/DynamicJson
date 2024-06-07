@@ -6,7 +6,7 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
 
-namespace DysonCore.DynamicJson.Tests.Runtime
+namespace DysonCore.DynamicJson.Tests.Runtime.SafeStringEnumParserTests
 {
     public class SafeStringEnumConverterTests
     {
@@ -51,7 +51,8 @@ namespace DysonCore.DynamicJson.Tests.Runtime
             {
                 new Apple(AppleVariety.Fuji), 
                 new Apple(AppleVariety.HoneyCrisp), 
-                new Apple(AppleVariety.Regular)
+                new Apple(AppleVariety.Regular),
+                new Apple(null)
             };
 
             string appleListString = JsonConvert.SerializeObject(appleList, _settings);
@@ -210,8 +211,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime
             [DefaultEnumValue]
             Regular,
             Fuji,
-            HoneyCrisp,
-            PinkLady
+            HoneyCrisp
         }
 
         private class Apple
@@ -219,7 +219,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime
             [JsonProperty("variety")]
             public AppleVariety? Variety { get; private set; }
 
-            internal Apple(AppleVariety variety)
+            internal Apple(AppleVariety? variety)
             {
                 Variety = variety;
             }

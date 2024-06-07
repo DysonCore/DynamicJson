@@ -22,11 +22,7 @@ namespace DysonCore.DynamicJson.InjectionConverter
 
         protected static TModel Resolve(object identifier)
         {
-            if (!ProviderRegistry.TryGetProvider(typeof(TModel), out IInjectionDataProvider provider))
-            {
-                //TODO make better exception
-                throw new Exception();
-            }
+            IInjectionDataProvider provider = ProviderRegistry.GetProvider(typeof(TModel));
             
             if (provider.GetValue(identifier) is not TModel model)
             {

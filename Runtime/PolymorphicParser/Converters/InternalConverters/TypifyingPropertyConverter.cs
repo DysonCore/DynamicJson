@@ -12,9 +12,9 @@ namespace DysonCore.DynamicJson.PolymorphicParser
         private static Type TypeToConvert => typeof(TypifyingPropertyData);
         private static Type PairGenericType => typeof(KeyValuePair<,>);
         private static Type ListGenericType => typeof(List<>);
+        private PropertyInfo[] Properties => _properties ??= TypeToConvert.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
 
-        private const string KeyName = "Key";
-        private const string ValueName = "Value";
+        private PropertyInfo[] _properties;
         
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
@@ -23,7 +23,7 @@ namespace DysonCore.DynamicJson.PolymorphicParser
             JToken valuesBufferToken = null;
             PropertyInfo bufferPropertyInfo = null;
             
-            foreach (PropertyInfo propertyInfo in TypeToConvert.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy))
+            foreach (PropertyInfo propertyInfo in Properties)
             {
                 JsonPropertyAttribute jsonAttribute = propertyInfo.GetCustomAttribute<JsonPropertyAttribute>();
                 string propertyName = jsonAttribute?.PropertyName ?? propertyInfo.Name;
@@ -70,7 +70,7 @@ namespace DysonCore.DynamicJson.PolymorphicParser
                 throw new Exception($"[{nameof(TypifyingPropertyConverter)}.{nameof(PostProcessBufferValue)}] Provided object of {nameof(Type)} {inputType.Name} is not compatible for post processing");
             }
             
-            List<KeyValuePair<object, Type>> listToReturn = new List<KeyValuePair<object, Type>>();
+            List<KeyValuePair<object, Type>> toReturn = new List<KeyValuePair<object, Type>>();
             
             foreach (object item in list)
             {
@@ -80,13 +80,13 @@ namespace DysonCore.DynamicJson.PolymorphicParser
                     continue;
                 }
 
-                object key = itemType.GetProperty(KeyName)?.GetValue(item);
-                object value = itemType.GetProperty(ValueName)?.GetValue(item);
+                object key = itemType.GetProperty(TypifyingPropertyConstants.KeyName)?.GetValue(item);
+                object value = itemType.GetProperty(TypifyingPropertyConstants.ValueName)?.GetValue(item);
                 
-                listToReturn.Add(new KeyValuePair<object, Type>(key, (Type)value));
+                toReturn.Add(new KeyValuePair<object, Type>(key, (Type)value));
             }
 
-            return listToReturn;
+            return toReturn;
         }
         
         public override bool CanConvert(Type objectType)

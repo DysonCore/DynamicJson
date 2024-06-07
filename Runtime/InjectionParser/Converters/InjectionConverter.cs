@@ -28,9 +28,9 @@ namespace DysonCore.DynamicJson.InjectionConverter
             }
             
             JToken token = JToken.Load(reader);
-            ProviderRegistry.TryGetProvider(injectableModel.ModelType, out IInjectionDataProvider provider);
+            IInjectionDataProvider provider = ProviderRegistry.GetProvider(injectableModel.ModelType);
             
-            injectableModel.Identifier = token.ToObject(provider.KeyType, serializer);
+            injectableModel.Identifier = token.ToObject(provider.ModelType, serializer);
 
             return injectableModel;
         }

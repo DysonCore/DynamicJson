@@ -2,28 +2,23 @@ using System;
 
 namespace DysonCore.DynamicJson.InjectionConverter
 {
-    public interface IInjectionDataProvider<in TKey, out TValue> : IInjectionDataProvider
+    public interface IInjectionDataProvider<in TModel, out TIdentifier> : IInjectionDataProvider
     {
-        Type IInjectionDataProvider.KeyType => typeof(TKey);
-        Type IInjectionDataProvider.ValueType => typeof(TValue);
+        Type IInjectionDataProvider.ModelType => typeof(TModel);
+        Type IInjectionDataProvider.IdentifierType => typeof(TIdentifier);
         
-        TValue GetValue(TKey key);
+        TIdentifier GetValue(TModel key);
 
-        object IInjectionDataProvider.GetValue(object key)
+        object IInjectionDataProvider.GetValue(object identifier)
         {
-            if (key is not TKey explicitKey)
-            {
-                return null;
-            }
-
-            return GetValue(explicitKey);
+            return identifier is TIdentifier actualIdentifier ? GetValue(actualIdentifier) : null;
         }
     }
 
     public interface IInjectionDataProvider
     {
-        internal Type KeyType { get; }
-        internal Type ValueType { get; }
-        object GetValue(object key);
+        internal Type ModelType { get; }
+        internal Type IdentifierType { get; }
+        internal object GetValue(object key);
     }
 }
