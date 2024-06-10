@@ -35,7 +35,6 @@ namespace DysonCore.DynamicJson.PolymorphicParser
         internal void OnBeforeSerialization(StreamingContext context)
         {
             ValuesSerializationBuffer = ValuesData.ToList();
-            
         }
 
         [OnDeserialized]

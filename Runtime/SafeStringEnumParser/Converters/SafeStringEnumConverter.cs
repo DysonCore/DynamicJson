@@ -77,7 +77,7 @@ namespace DysonCore.DynamicJson.SafeStringEnumParser
         {
             Type actualType = Nullable.GetUnderlyingType(type) ?? type; //is used to support nullable enums
 
-            if(DefaultsMap.TryGetValue(actualType, out object value))
+            if(DefaultsMap.TryGetValue(actualType, out object value)) //check cache for resolved defaults 
             {
                 return value;
             }

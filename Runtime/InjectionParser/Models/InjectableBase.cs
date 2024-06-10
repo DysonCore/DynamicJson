@@ -2,7 +2,7 @@ using System;
 
 namespace DysonCore.DynamicJson.InjectionConverter
 {
-    public abstract class InjectableModelBase<TModel> : IInjectableModel<TModel>
+    public abstract class InjectableBase<TModel> : IInjectable<TModel>
     {
         protected TModel Model;
         public virtual TModel Value 
@@ -11,12 +11,12 @@ namespace DysonCore.DynamicJson.InjectionConverter
             protected set => Model = value;
         }
 
-        object IInjectableModel.Identifier
+        object IInjectable.Identifier
         {
             set => SetIdentifier(value);
         }
 
-        public static implicit operator TModel(InjectableModelBase<TModel> injectableModel) => injectableModel.Value;
+        public static implicit operator TModel(InjectableBase<TModel> injectable) => injectable.Value;
 
         protected abstract void SetIdentifier(object identifier);
 

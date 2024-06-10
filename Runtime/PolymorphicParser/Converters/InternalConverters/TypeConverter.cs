@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -6,6 +7,8 @@ namespace DysonCore.DynamicJson.PolymorphicParser
 {
     internal sealed class TypeConverter : JsonConverter
     {
+        private readonly Dictionary<string, Type> _typeMap = new ();
+        
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             if (value is not Type type)
@@ -21,7 +24,16 @@ namespace DysonCore.DynamicJson.PolymorphicParser
         {
             JToken token = JToken.Load(reader);
             string typeName = token.ToObject<string>();
-            Type type = Type.GetType(typeName);
+
+            if (_typeMap.TryGetValue(typeName, out Type type))
+            {
+                //do not resolve the type if it is already cached
+                return type;
+            }
+            
+            type = Type.GetType(typeName);
+            _typeMap[typeName] = type;
+            
             return type;
         }
 

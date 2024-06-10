@@ -5,6 +5,7 @@ namespace DysonCore.DynamicJson.InjectionConverter
 {
     internal static class ProviderRegistry
     {
+        //Concurrent Dictionary for thread safety 
         private static readonly ConcurrentDictionary<Type, IInjectionDataProvider> ModelToProviderData = new ();
 
         internal static void AddProvider(IInjectionDataProvider provider)
@@ -16,7 +17,7 @@ namespace DysonCore.DynamicJson.InjectionConverter
 
             if (ModelToProviderData.TryAdd(provider.IdentifierType, provider) is false)
             {
-                throw new Exception($"[{nameof(ProviderRegistry)}.{nameof(AddProvider)}] Instance of {provider.GetType().Name} already exists. Use only one instance!");
+                throw new Exception($"[{nameof(ProviderRegistry)}.{nameof(AddProvider)}] Instance of {provider.GetType().Name} already exists. Use only one instance! ");
             }
         }
         

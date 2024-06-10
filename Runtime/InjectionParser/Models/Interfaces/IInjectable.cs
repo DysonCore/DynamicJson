@@ -2,12 +2,12 @@ using System;
 
 namespace DysonCore.DynamicJson.InjectionConverter
 {
-    internal interface IInjectableModel<TModel> : IInjectableModel
+    internal interface IInjectable<TModel> : IInjectable
     {
-        Type IInjectableModel.ModelType => typeof(TModel);
+        Type IInjectable.ModelType => typeof(TModel);
     }
 
-    internal interface IInjectableModel
+    internal interface IInjectable
     {
         internal Type ModelType { get; }
         internal object Identifier { set; }

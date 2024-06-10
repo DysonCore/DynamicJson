@@ -20,6 +20,7 @@ namespace DysonCore.DynamicJson.PolymorphicParser
         {
             JObject jObject = JObject.Load(reader);
             TypifyingPropertyData data = existingValue as TypifyingPropertyData ?? (TypifyingPropertyData)Activator.CreateInstance(TypeToConvert, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.CreateInstance, null, new object[] {}, null);
+            
             JToken valuesBufferToken = null;
             PropertyInfo bufferPropertyInfo = null;
             
@@ -75,6 +76,7 @@ namespace DysonCore.DynamicJson.PolymorphicParser
             foreach (object item in list)
             {
                 Type itemType = item.GetType();
+                
                 if (!itemType.IsGenericType || itemType.GetGenericTypeDefinition() != PairGenericType)
                 {
                     continue;

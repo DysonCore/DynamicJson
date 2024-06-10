@@ -6,7 +6,7 @@ namespace DysonCore.DynamicJson.InjectionConverter
 {
     public class InjectionConverter : JsonConverter
     {
-        private Type ConvertableType => typeof(IInjectableModel);
+        private Type ConvertableType => typeof(IInjectable);
         
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
@@ -22,7 +22,7 @@ namespace DysonCore.DynamicJson.InjectionConverter
 
             object instance = Activator.CreateInstance(objectType);
 
-            if (instance is not IInjectableModel injectableModel)
+            if (instance is not IInjectable injectableModel)
             {
                 throw new Exception();
             }

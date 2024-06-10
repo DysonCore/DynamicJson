@@ -33,7 +33,7 @@ namespace DysonCore.DynamicJson.PolymorphicParser
         {
             foreach (var pair in _dataSerializationBuffer)
             {
-                //[OnDeserialized] attribute is called only on the root object. So it should be called manually in this case.
+                //OnDeserializedAttribute is called only on the root deserializing object. Should be called manually in this case.
                 pair.Value.OnAfterDeserialization(context);
             }
             

@@ -1,6 +1,6 @@
 namespace DysonCore.DynamicJson.InjectionConverter
 {
-    public class LazyInjectableModel<TModel> : InjectableModelBase<TModel>
+    public class LazyInjectable<TModel> : InjectableBase<TModel>
     {
         private object _identifier;
 

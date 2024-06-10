@@ -14,7 +14,7 @@ namespace DysonCore.DynamicJson.PolymorphicParser
         private readonly PolymorphicCache _polymorphicCache;
         private readonly ThreadLocal<List<Type>> _typesToIgnore = new (() => new List<Type>());
         
-        private Dictionary<Type, TypifyingPropertyData> BaseToPropertyData => _polymorphicCache.Data;
+        private Dictionary<Type, TypifyingPropertyData> BaseToPropertyMap => _polymorphicCache.Data;
 
         private UnknownTypeHandling UnknownTypeHandling { get; }
         
@@ -39,7 +39,7 @@ namespace DysonCore.DynamicJson.PolymorphicParser
             JToken token = JToken.Load(reader);
             object toReturn;
 
-            if (!BaseToPropertyData.TryGetValue(objectType, out TypifyingPropertyData propertyData))
+            if (!BaseToPropertyMap.TryGetValue(objectType, out TypifyingPropertyData propertyData))
             {
                 _typesToIgnore.Value.Add(objectType);
                 toReturn = token.ToObject(objectType, serializer);
@@ -123,7 +123,7 @@ namespace DysonCore.DynamicJson.PolymorphicParser
         /// <returns>True if the type can be converted; otherwise, false.</returns>
         public override bool CanConvert(Type objectType)
         {
-            return BaseToPropertyData.ContainsKey(objectType) && !_typesToIgnore.Value.Contains(objectType);
+            return BaseToPropertyMap.ContainsKey(objectType) && !_typesToIgnore.Value.Contains(objectType);
         }
 
         /// <inheritdoc />

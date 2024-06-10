@@ -1,6 +1,6 @@
 namespace DysonCore.DynamicJson.InjectionConverter
 {
-    public class EagerInjectableModel<TModel> : InjectableModelBase<TModel>
+    public class EagerInjectable<TModel> : InjectableBase<TModel>
     {
         protected sealed override void SetIdentifier(object identifier)
         {
