@@ -10,13 +10,13 @@ namespace DysonCore.DynamicJson.PolymorphicParser
     internal abstract class PropertyData
     {
         [JsonProperty("propertyType")]
-        public Type PropertyType { get; protected set; }
+        public Type PropertyType { get; protected set; } //any Property for deserialization in the base class needs to have protected setter (not private), since newtonsoft cant set data into fields to which upper class has no access.  
         
         [JsonProperty("name")]
         public string JsonName { get; protected set; }
         
         [JsonIgnore]
-        public string PropertyName { get; protected set; }
+        public string PropertyName { get; private set; }
 
         protected internal PropertyData(Type propertyType, string propertyName, string jsonName)
         {

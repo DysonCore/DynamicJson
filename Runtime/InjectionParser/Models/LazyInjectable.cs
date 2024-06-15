@@ -2,14 +2,19 @@ using Newtonsoft.Json;
 
 namespace DysonCore.DynamicJson.InjectionParser
 {
-    public class LazyInjectable<TModel> : InjectableBase<TModel>
+    public sealed class LazyInjectable<TModel> : InjectableBase<TModel>
     {
         private object _identifier;
 
-        public sealed override TModel Value
+        public override TModel Value
         {
             get => InternalValue ??= Resolve(_identifier);
             protected set => InternalValue = value;
+        }
+        
+        public override object Identifier
+        {
+            set => _identifier = value;
         }
 
         public LazyInjectable(TModel value)
@@ -19,10 +24,7 @@ namespace DysonCore.DynamicJson.InjectionParser
 
         [JsonConstructor]
         private LazyInjectable() { }
-
-        protected sealed override void SetIdentifier(object identifier)
-        {
-            _identifier = identifier;
-        }
+        
+        public static implicit operator TModel(LazyInjectable<TModel> injectable) => injectable.Value;
     }
 }

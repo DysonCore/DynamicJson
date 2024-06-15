@@ -2,11 +2,11 @@ using Newtonsoft.Json;
 
 namespace DysonCore.DynamicJson.InjectionParser
 {
-    public class EagerInjectable<TModel> : InjectableBase<TModel>
+    public sealed class EagerInjectable<TModel> : InjectableBase<TModel>
     {
-        protected sealed override void SetIdentifier(object identifier)
+        public override object Identifier
         {
-            Value = Resolve(identifier);
+            set => Value = Resolve(value);
         }
 
         public EagerInjectable(TModel value) : base(value)
@@ -16,5 +16,7 @@ namespace DysonCore.DynamicJson.InjectionParser
 
         [JsonConstructor]
         private EagerInjectable() { }
+
+        public static implicit operator TModel(EagerInjectable<TModel> injectable) => injectable.Value;
     }
 }

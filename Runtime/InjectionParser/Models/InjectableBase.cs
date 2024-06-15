@@ -1,4 +1,3 @@
-using System;
 using Newtonsoft.Json;
 
 namespace DysonCore.DynamicJson.InjectionParser
@@ -7,12 +6,13 @@ namespace DysonCore.DynamicJson.InjectionParser
     {
         protected TModel InternalValue;
         
-        public virtual TModel Value { get => InternalValue; protected set => InternalValue = value; }
-
-        object IInjectable.Identifier
-        {
-            set => SetIdentifier(value);
+        public virtual TModel Value 
+        { 
+            get => InternalValue; 
+            protected set => InternalValue = value;
         }
+
+        public abstract object Identifier { set; }
 
         protected InjectableBase(TModel value)
         {
@@ -21,21 +21,10 @@ namespace DysonCore.DynamicJson.InjectionParser
 
         [JsonConstructor]
         protected InjectableBase() { }
-        
-        protected abstract void SetIdentifier(object identifier);
 
-        public static implicit operator TModel(InjectableBase<TModel> injectable) => injectable.Value;
-        
         protected static TModel Resolve(object identifier)
         {
-            IInjectionDataProvider provider = ProviderRegistry.GetProvider(typeof(TModel));
-            
-            if (provider.GetValue(identifier) is not TModel model)
-            {
-                throw new Exception();
-            }
-
-            return model;
+            return IInjectable<TModel>.Resolve(identifier);
         }
     }
 }
