@@ -4,13 +4,20 @@ using Newtonsoft.Json.Linq;
 
 namespace DysonCore.DynamicJson.InjectionParser
 {
+    /// <summary>
+    /// JSON converter for objects implementing the <see cref="IInjectable"/> interface.
+    /// </summary>
     public class InjectionConverter : JsonConverter
     {
+        /// <summary>
+        /// Type to convert by <see cref="InjectionConverter"/>.
+        /// </summary>
         private Type ConvertableType => typeof(IInjectable);
         
+        /// <inheritdoc />
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (value is not IInjectable injectable) //impossible case
+            if (value is not IInjectable injectable) // impossible case.
             {
                 throw new JsonWriterException($"[{nameof(InjectionConverter)}.{nameof(WriteJson)}] {nameof(InjectionConverter)} has received {nameof(Type)} for serialization which it can't process. \n{nameof(Type)} - {value?.GetType().Name}");
             }
@@ -22,6 +29,7 @@ namespace DysonCore.DynamicJson.InjectionParser
             serializer.Serialize(writer, identifier);
         }
 
+        /// <inheritdoc />
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             if (objectType.IsAbstract)
@@ -31,7 +39,7 @@ namespace DysonCore.DynamicJson.InjectionParser
 
             object instance = Activator.CreateInstance(objectType, true);
 
-            if (instance is not IInjectable injectable) //impossible case
+            if (instance is not IInjectable injectable) // impossible case.
             {
                 throw new JsonReaderException($"[{nameof(InjectionConverter)}.{nameof(ReadJson)}] {nameof(InjectionConverter)} has received {nameof(Type)} for deserialization which it can't process. \n{nameof(Type)} - {objectType.Name}");
             }
@@ -45,6 +53,7 @@ namespace DysonCore.DynamicJson.InjectionParser
             return injectable;
         }
 
+        /// <inheritdoc />
         public override bool CanConvert(Type objectType)
         {
             return ConvertableType.IsAssignableFrom(objectType);

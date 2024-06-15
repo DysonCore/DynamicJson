@@ -22,7 +22,7 @@ namespace DysonCore.DynamicJson.PolymorphicParser
         private readonly ThreadLocal<List<Type>> _typesToIgnore = new (() => new List<Type>());
         
         /// <summary>
-        /// Fast access to polymorphic cache data.
+        /// Fast access to <see cref="PolymorphicCache"/> data.
         /// </summary>
         private Dictionary<Type, TypifyingPropertyData> BaseToPropertyMap => _polymorphicCache.Data;
 
@@ -127,7 +127,7 @@ namespace DysonCore.DynamicJson.PolymorphicParser
         }
 
         /// <summary>
-        /// Determines if the given type can be converted using this converter.
+        /// Determines if the given <see cref="Type"/> can be converted using <see cref="PolymorphicConverter"/>.
         /// </summary>
         /// <param name="objectType">Type of the object to check.</param>
         /// <returns>True if the type can be converted; otherwise, false.</returns>

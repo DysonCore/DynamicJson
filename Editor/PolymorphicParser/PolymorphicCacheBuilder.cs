@@ -118,7 +118,7 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
                 BaseToPropertyData[baseClass] = propertyData;
             }
 
-            if (classType.IsAbstract) //if class is abstract - its impossible to create instance of it, so
+            if (classType.IsAbstract) //if class is abstract - its impossible to create instance of it, so...
             {
                 if (classType != baseClass) //if current class is abstract class, and current class is not a class which defines current TypifyingProperty -> add this class to the list of abstract classes for post-processing. 
                 {
