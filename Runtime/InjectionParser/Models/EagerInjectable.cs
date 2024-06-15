@@ -11,7 +11,7 @@ namespace DysonCore.DynamicJson.InjectionParser
         /// <summary>
         /// Sets the identifier and immediately resolves the model value.
         /// </summary>
-        public override object Identifier
+        protected override object Identifier
         {
             set => Value = Resolve(value);
         }

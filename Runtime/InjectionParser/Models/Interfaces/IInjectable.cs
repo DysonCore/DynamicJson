@@ -16,10 +16,9 @@ namespace DysonCore.DynamicJson.InjectionParser
         /// <summary>
         /// Sets the identifier used to resolve the model value.
         /// </summary>
-        object Identifier { set; }
+        protected object Identifier { set; }
 
         Type IInjectable.ModelType => typeof(TModel);
-
         object IInjectable.GetValue() => Value;
         void IInjectable.SetIdentifier(object identifier) => Identifier = identifier;
 

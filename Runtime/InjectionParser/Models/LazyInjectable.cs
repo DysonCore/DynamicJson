@@ -20,7 +20,7 @@ namespace DysonCore.DynamicJson.InjectionParser
         }
         
         /// <inheritdoc />
-        public override object Identifier
+        protected override object Identifier
         {
             set => _identifier = value;
         }

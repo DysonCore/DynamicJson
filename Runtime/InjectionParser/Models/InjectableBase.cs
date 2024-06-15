@@ -11,7 +11,13 @@ namespace DysonCore.DynamicJson.InjectionParser
         protected TModel InternalValue;
         
         /// <summary>
+        /// Sets the identifier used to resolve the model value.
+        /// </summary>
+        protected abstract object Identifier { set; }
+        
+        /// <summary>
         /// Virtual property to get and set the model value.
+        /// Can be overriden to create different resolving behaviours.
         /// </summary>
         public virtual TModel Value 
         { 
@@ -20,9 +26,12 @@ namespace DysonCore.DynamicJson.InjectionParser
         }
 
         /// <summary>
-        /// Sets the identifier used to resolve the model value.
+        /// Re-route of internal Identifier setter to protected setter.
         /// </summary>
-        public abstract object Identifier { set; }
+        object IInjectable<TModel>.Identifier
+        {
+            set => Identifier = value;
+        }
 
         /// <summary>
         /// Initializes a new instance with a given model value.
