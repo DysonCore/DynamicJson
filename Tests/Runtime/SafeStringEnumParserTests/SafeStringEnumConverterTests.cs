@@ -8,16 +8,23 @@ using NUnit.Framework;
 
 namespace DysonCore.DynamicJson.Tests.Runtime.SafeStringEnumParserTests
 {
+    [TestFixture]
     public class SafeStringEnumConverterTests
     {
         private JsonSerializerSettings _settings;
     
-        [SetUp]
-        public void SetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
             _settings = new JsonSerializerSettings();
             _settings.Converters.Add(new PolymorphicConverter());
             _settings.Converters.Add(new SafeStringEnumConverter(new CamelCaseNamingStrategy { OverrideSpecifiedNames = false }));
+        }
+        
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            _settings = null;
         }
 
         [Test]

@@ -5,6 +5,7 @@ using NUnit.Framework;
 
 namespace DysonCore.DynamicJson.Tests.Runtime.InjectionParserTests
 {
+    [TestFixture]
     public class InjectionParserTests
     {
         private JsonSerializerSettings _settings;
@@ -15,8 +16,8 @@ namespace DysonCore.DynamicJson.Tests.Runtime.InjectionParserTests
         private const string ShortSwordId = "short_sword_01";
         private const string CursedShortSwordId = "short_sword_02";
         
-        [SetUp]
-        public void SetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
             _settings = new JsonSerializerSettings();
             _settings.Converters.Add(new InjectionConverter());
@@ -32,6 +33,45 @@ namespace DysonCore.DynamicJson.Tests.Runtime.InjectionParserTests
             _weaponDataProvider.AddConfig(daggerConfig);
             _weaponDataProvider.AddConfig(shortSwordConfig);
             _weaponDataProvider.AddConfig(cursedShortSwordConfig);
+        }
+
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            _settings = null;
+            _weaponDataProvider = null;
+        }
+        
+        [Test]
+        public void DeserializeModelsWithInjection_CompletesSuccessfully()
+        {
+            WeaponConfig heavyBladeConfig = _weaponDataProvider.GetValue(HeavyBladeId);
+            WeaponConfig daggerConfig = _weaponDataProvider.GetValue(DaggerId);
+            WeaponConfig shortSwordConfig = _weaponDataProvider.GetValue(ShortSwordId);
+            
+            Weapon heavyWeapon = new Weapon(heavyBladeConfig, "Big spoon");
+            Weapon daggerWeapon = new Weapon(daggerConfig, "THE pencil");
+            Weapon shortWeapon = new Weapon(shortSwordConfig, "Long boy");
+
+            string heavyWeaponString = JsonConvert.SerializeObject(heavyWeapon, _settings);
+            string daggerWeaponString = JsonConvert.SerializeObject(daggerWeapon, _settings);
+            string shortWeaponString = JsonConvert.SerializeObject(shortWeapon, _settings);
+
+            Weapon deserializedHeavyWeapon = JsonConvert.DeserializeObject<Weapon>(heavyWeaponString, _settings);
+            Weapon deserializedDaggerWeapon = JsonConvert.DeserializeObject<Weapon>(daggerWeaponString, _settings);
+            Weapon deserializedShortWeapon = JsonConvert.DeserializeObject<Weapon>(shortWeaponString, _settings);
+            
+            Assert.IsNotNull(deserializedHeavyWeapon);
+            Assert.IsNotNull(deserializedDaggerWeapon);
+            Assert.IsNotNull(deserializedShortWeapon);
+            
+            Assert.IsNotNull(deserializedHeavyWeapon.Config);
+            Assert.IsNotNull(deserializedDaggerWeapon.Config);
+            Assert.IsNotNull(deserializedShortWeapon.Config);
+            
+            Assert.AreEqual(heavyWeapon.Config.Value.Id, deserializedHeavyWeapon.Config.Value.Id);
+            Assert.AreEqual(daggerWeapon.Config.Value.Id, deserializedDaggerWeapon.Config.Value.Id);
+            Assert.AreEqual(shortWeapon.Config.Value.Id, deserializedShortWeapon.Config.Value.Id);
         }
 
         [Test]
