@@ -2,7 +2,7 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace DysonCore.DynamicJson.InjectionConverter
+namespace DysonCore.DynamicJson.InjectionParser
 {
     public class InjectionConverter : JsonConverter
     {
@@ -10,29 +10,38 @@ namespace DysonCore.DynamicJson.InjectionConverter
         
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            throw new NotImplementedException();
+            if (value is not IInjectable injectable) //impossible case
+            {
+                throw new JsonWriterException($"[{nameof(InjectionConverter)}.{nameof(WriteJson)}] {nameof(InjectionConverter)} has received {nameof(Type)} for serialization which it can't process. \n{nameof(Type)} - {value?.GetType().Name}");
+            }
+
+            IInjectionDataProvider provider = ProviderRegistry.GetProvider(injectable.ModelType);
+            object modelValue = injectable.GetValue();
+            object identifier = provider.GetIdentifier(modelValue);
+            
+            serializer.Serialize(writer, identifier);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            if (objectType == null || objectType.IsAbstract)
+            if (objectType.IsAbstract)
             {
-                throw new Exception();
+                throw new JsonReaderException($"[{nameof(InjectionConverter)}.{nameof(ReadJson)}] {nameof(IInjectable)} property is abstract! Use concrete implementations!.\n{nameof(objectType)} - {objectType.Name}.");
             }
 
-            object instance = Activator.CreateInstance(objectType);
+            object instance = Activator.CreateInstance(objectType, true);
 
-            if (instance is not IInjectable injectableModel)
+            if (instance is not IInjectable injectable) //impossible case
             {
-                throw new Exception();
+                throw new JsonReaderException($"[{nameof(InjectionConverter)}.{nameof(ReadJson)}] {nameof(InjectionConverter)} has received {nameof(Type)} for deserialization which it can't process. \n{nameof(Type)} - {objectType.Name}");
             }
             
             JToken token = JToken.Load(reader);
-            IInjectionDataProvider provider = ProviderRegistry.GetProvider(injectableModel.ModelType);
+            IInjectionDataProvider provider = ProviderRegistry.GetProvider(injectable.ModelType);
             
-            injectableModel.Identifier = token.ToObject(provider.ModelType, serializer);
+            injectable.Identifier = token.ToObject(provider.IdentifierType, serializer);
 
-            return injectableModel;
+            return injectable;
         }
 
         public override bool CanConvert(Type objectType)

@@ -10,7 +10,7 @@ namespace DysonCore.DynamicJson.PolymorphicParser
     /// Represents metadata for properties marked with the <see cref="TypifyingPropertyAttribute"/>. 
     /// Contains information about property type, name, JSON name, and the mapping between values and their respective types, as well as any <see cref="TypifyingPropertyAttribute"/>s associated with this <see cref="TypifiedPropertyAttribute"/>.
     /// </summary>
-    internal class TypifyingPropertyData : PropertyData
+    internal sealed class TypifyingPropertyData : PropertyData
     {
         [JsonProperty("typifiedProperties")]
         internal List<TypifiedPropertyData> TypifiedProperties { get; private set; }

@@ -26,6 +26,6 @@ namespace DysonCore.DynamicJson.PolymorphicParser
         }
 
         [JsonConstructor]
-        protected internal PropertyData() { }
+        protected PropertyData() { }
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 
-namespace DysonCore.DynamicJson.InjectionConverter
+namespace DysonCore.DynamicJson.InjectionParser
 {
     internal static class ProviderRegistry
     {
@@ -15,7 +15,7 @@ namespace DysonCore.DynamicJson.InjectionConverter
                 return;
             }
 
-            if (ModelToProviderData.TryAdd(provider.IdentifierType, provider) is false)
+            if (ModelToProviderData.TryAdd(provider.ValueType, provider) is false)
             {
                 throw new Exception($"[{nameof(ProviderRegistry)}.{nameof(AddProvider)}] Instance of {provider.GetType().Name} already exists. Use only one instance! ");
             }
@@ -28,7 +28,7 @@ namespace DysonCore.DynamicJson.InjectionConverter
                 return;
             }
 
-            ModelToProviderData.TryRemove(provider.IdentifierType, out _);
+            ModelToProviderData.TryRemove(provider.ValueType, out _);
         }
 
         internal static IInjectionDataProvider GetProvider(Type modelType)

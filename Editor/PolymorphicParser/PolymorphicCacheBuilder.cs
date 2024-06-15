@@ -103,7 +103,9 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
             JsonPropertyAttribute jsonProperty = propertyInfo.GetCustomAttribute<JsonPropertyAttribute>();
 
             Type baseClass = typifyingAttribute.InheritanceRoot ?? classType.GetDeclaringClass(propertyInfo.Name); //get base declaring class for the current property. Manual declaration of root class is prioritized.  
-            TypifyingPropertyAttribute baseAttribute = baseClass.GetProperty(propertyInfo.Name)?.GetCustomAttribute<TypifyingPropertyAttribute>();
+            
+            PropertyInfo basePropertyInfo = baseClass.GetProperty(propertyInfo.Name);
+            TypifyingPropertyAttribute baseAttribute = basePropertyInfo?.GetCustomAttribute<TypifyingPropertyAttribute>();
 
             if (baseAttribute == null)
             {
@@ -145,7 +147,7 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
         /// for handling custom serialization and deserialization behaviors of these composed properties based on <see cref="TypifyingPropertyAttribute"/> of the holder class.
         /// </summary>
         /// <param name="propertyInfo">The <see cref="PropertyInfo"/> object of the property with <see cref="TypifiedPropertyAttribute"/>.</param>
-        /// <param name="classType">The Type of the class that contains the the property with <see cref="TypifiedPropertyAttribute"/>.</param>
+        /// <param name="classType">The Type of the class that contains the property with <see cref="TypifiedPropertyAttribute"/>.</param>
         private static void ProcessTypifiedProperty(PropertyInfo propertyInfo, Type classType)
         {
             Type propertyType = propertyInfo.PropertyType;

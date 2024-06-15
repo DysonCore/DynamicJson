@@ -1,6 +1,6 @@
-namespace DysonCore.DynamicJson.InjectionConverter
+namespace DysonCore.DynamicJson.InjectionParser
 {
-    public abstract class InjectionDataProvider<TModel, TIdentifier> : IInjectionDataProvider<TModel, TIdentifier>
+    public abstract class InjectionDataProvider<TIdentifier, TModel> : IInjectionDataProvider<TIdentifier, TModel>
     {
         protected InjectionDataProvider()
         {
@@ -13,5 +13,6 @@ namespace DysonCore.DynamicJson.InjectionConverter
         }
         
         public abstract TModel GetValue(TIdentifier key);
+        public abstract TIdentifier GetIdentifier(TModel value);
     }
 }

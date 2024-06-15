@@ -1,4 +1,6 @@
-namespace DysonCore.DynamicJson.InjectionConverter
+using Newtonsoft.Json;
+
+namespace DysonCore.DynamicJson.InjectionParser
 {
     public class EagerInjectable<TModel> : InjectableBase<TModel>
     {
@@ -6,5 +8,13 @@ namespace DysonCore.DynamicJson.InjectionConverter
         {
             Value = Resolve(identifier);
         }
+
+        public EagerInjectable(TModel value) : base(value)
+        {
+            InternalValue = value;
+        }
+
+        [JsonConstructor]
+        private EagerInjectable() { }
     }
 }

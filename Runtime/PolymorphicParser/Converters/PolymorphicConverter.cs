@@ -11,9 +11,19 @@ namespace DysonCore.DynamicJson.PolymorphicParser
     /// </summary>
     public sealed class PolymorphicConverter : JsonConverter
     {
+        /// <summary>
+        /// Polymorphic data cache holder.
+        /// </summary>
         private readonly PolymorphicCache _polymorphicCache;
+        /// <summary>
+        /// Thread-unique collection of ignored <see cref="Type"/>s on deserialization.
+        /// Used to enforce <see cref="JsonSerializer"/> to use default deserialization flow ignoring <see cref="PolymorphicConverter"/>.
+        /// </summary>
         private readonly ThreadLocal<List<Type>> _typesToIgnore = new (() => new List<Type>());
         
+        /// <summary>
+        /// Fast access to polymorphic cache data.
+        /// </summary>
         private Dictionary<Type, TypifyingPropertyData> BaseToPropertyMap => _polymorphicCache.Data;
 
         private UnknownTypeHandling UnknownTypeHandling { get; }
@@ -123,7 +133,7 @@ namespace DysonCore.DynamicJson.PolymorphicParser
         /// <returns>True if the type can be converted; otherwise, false.</returns>
         public override bool CanConvert(Type objectType)
         {
-            return BaseToPropertyMap.ContainsKey(objectType) && !_typesToIgnore.Value.Contains(objectType);
+            return !_typesToIgnore.Value.Contains(objectType) && BaseToPropertyMap.ContainsKey(objectType);
         }
 
         /// <inheritdoc />

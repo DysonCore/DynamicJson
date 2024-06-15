@@ -105,7 +105,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime.PolymorphicParserTests
             List<RewardWrapper> deserializedWrappers = JsonConvert.DeserializeObject<List<RewardWrapper>>(rewardsJson, _settings);
             
             Assert.IsNotNull(deserializedWrappers);
-            Assert.IsTrue(deserializedWrappers.Count == wrappers.Count);
+            Assert.AreEqual(deserializedWrappers.Count, wrappers.Count);
             
             for (int i = 0; i < wrappers.Count; i++)
             {
@@ -157,7 +157,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime.PolymorphicParserTests
             List<IAnimal> deserializedAnimals = JsonConvert.DeserializeObject<List<IAnimal>>(animalJson, _settings);
             
             Assert.IsNotNull(deserializedAnimals);
-            Assert.IsTrue(deserializedAnimals.Count == animals.Count);
+            Assert.AreEqual(deserializedAnimals.Count, animals.Count);
 
             for (int i = 0; i < animals.Count; i++)
             {
@@ -180,7 +180,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime.PolymorphicParserTests
             List<Colour> deserializedColours = JsonConvert.DeserializeObject<List<Colour>>(coloursJson, _settings);
             
             Assert.IsNotNull(deserializedColours);
-            Assert.IsTrue(deserializedColours.Count == colours.Count);
+            Assert.AreEqual(deserializedColours.Count, colours.Count);
 
             for (int i = 0; i < colours.Count; i++)
             {
@@ -190,7 +190,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime.PolymorphicParserTests
             }
         }
         
-#region TestModels_Reward
+#region TestModel_Reward
 
         private class RewardWrapper
         {
@@ -276,7 +276,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime.PolymorphicParserTests
 
 #endregion
         
-#region TestModels_Animal
+#region TestModel_Animal
 
         private interface IAnimal
         {
@@ -312,7 +312,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime.PolymorphicParserTests
         
 #endregion
 
-#region TestModels_Colour
+#region TestModel_Colour
 
         private abstract class Colour
         {

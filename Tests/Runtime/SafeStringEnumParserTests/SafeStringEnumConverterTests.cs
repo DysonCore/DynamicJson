@@ -35,7 +35,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime.SafeStringEnumParserTests
             List<Food> deserializedFoodList = JsonConvert.DeserializeObject<List<Food>>(foodListString, _settings);
             
             Assert.IsNotNull(deserializedFoodList);
-            Assert.IsTrue(deserializedFoodList.Count == foodList.Count);
+            Assert.AreEqual(deserializedFoodList.Count, foodList.Count);
 
             for (int i = 0; i < deserializedFoodList.Count; i++)
             {
@@ -60,7 +60,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime.SafeStringEnumParserTests
             List<Apple> deserializedAppleList = JsonConvert.DeserializeObject<List<Apple>>(appleListString, _settings);
             
             Assert.IsNotNull(deserializedAppleList);
-            Assert.IsTrue(deserializedAppleList.Count == appleList.Count);
+            Assert.AreEqual(deserializedAppleList.Count, appleList.Count);
 
             for (int i = 0; i < deserializedAppleList.Count; i++)
             {
@@ -84,7 +84,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime.SafeStringEnumParserTests
             List<Food> deserializedFoodList = JsonConvert.DeserializeObject<List<Food>>(foodListString, _settings);
             
             Assert.IsNotNull(deserializedFoodList);
-            Assert.IsTrue(deserializedFoodList.Count == foodList.Count);
+            Assert.AreEqual(deserializedFoodList.Count, foodList.Count);
 
             for (int i = 0; i < deserializedFoodList.Count; i++)
             {
@@ -120,7 +120,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime.SafeStringEnumParserTests
             List<Plate> deserializedPlates = JsonConvert.DeserializeObject<List<Plate>>(platesString, _settings);
             
             Assert.IsNotNull(deserializedPlates);
-            Assert.IsTrue(deserializedPlates.Count == plates.Count);
+            Assert.AreEqual(deserializedPlates.Count, plates.Count);
 
             for (int i = 0; i < deserializedPlates.Count; i++)
             {
@@ -145,7 +145,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime.SafeStringEnumParserTests
             List<Plate> deserializedPlates = JsonConvert.DeserializeObject<List<Plate>>(platesString, _settings);
             
             Assert.IsNotNull(deserializedPlates);
-            Assert.IsTrue(deserializedPlates.Count == plates.Count);
+            Assert.AreEqual(deserializedPlates.Count, plates.Count);
 
             for (int i = 0; i < deserializedPlates.Count; i++)
             {
@@ -168,7 +168,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime.SafeStringEnumParserTests
             Assert.Throws<JsonSerializationException>(() => JsonConvert.DeserializeObject<List<Plate>>(platesString, settings));
         }
 
-#region TestModels_Foods
+#region TestModel_Foods
         
         private enum Food
         {
@@ -204,7 +204,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime.SafeStringEnumParserTests
 
 #endregion
 
-#region TestModels_NullableEnum  
+#region TestModel_Apples 
         
         private enum AppleVariety
         {

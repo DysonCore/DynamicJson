@@ -82,7 +82,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime.PolymorphicParserTests
             List<Quest> deserializedQuestList = JsonConvert.DeserializeObject<List<Quest>>(questsString, _settings);
             
             Assert.IsNotNull(deserializedQuestList);
-            Assert.IsTrue(quests.Count == deserializedQuestList.Count);
+            Assert.AreEqual(quests.Count, deserializedQuestList.Count);
             
             for (int i = 0; i < deserializedQuestList.Count; i++)
             {
@@ -94,7 +94,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime.PolymorphicParserTests
         }
         
         
-#region TestModels_Quests
+#region TestModel_Quests
 
         private class Quest
         {
@@ -161,7 +161,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime.PolymorphicParserTests
 
 #endregion
 
-#region TestModels_Rewards
+#region TestModel_Rewards
 
         private class Reward
         {
