@@ -6,7 +6,7 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
 
-namespace DysonCore.DynamicJson.Tests.Runtime.SafeStringEnumParserTests
+namespace DysonCore.DynamicJson.Tests.Runtime
 {
     [TestFixture]
     public class SafeStringEnumConverterTests

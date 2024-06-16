@@ -3,7 +3,7 @@ using DysonCore.DynamicJson.InjectionParser;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
-namespace DysonCore.DynamicJson.Tests.Runtime.InjectionParserTests
+namespace DysonCore.DynamicJson.Tests.Runtime
 {
     [TestFixture]
     public class InjectionParserTests

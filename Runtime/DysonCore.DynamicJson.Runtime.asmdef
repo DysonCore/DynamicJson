@@ -1,5 +1,5 @@
 {
-    "name": "DysonCore.DynamicJson",
+    "name": "DysonCore.DynamicJson.Runtime",
     "rootNamespace": "DysonCore.DynamicJson",
     "references": [],
     "includePlatforms": [],

@@ -6,7 +6,7 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
 
-namespace DysonCore.DynamicJson.Tests.Runtime.PolymorphicParserTests
+namespace DysonCore.DynamicJson.Tests.Runtime
 {
     [TestFixture]
     public class TypifyingPropertyTests 

@@ -2,7 +2,7 @@
     "name": "DysonCore.DynamicJson.Editor",
     "rootNamespace": "DysonCore.DynamicJson.Editor",
     "references": [
-        "DysonCore.DynamicJson"
+        "DysonCore.DynamicJson.Runtime"
     ],
     "includePlatforms": [
         "Editor"

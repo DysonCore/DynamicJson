@@ -17,7 +17,7 @@ namespace DysonCore.DynamicJson.InjectionParser
         /// <inheritdoc />
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (value is not IInjectable injectable) // impossible case.
+            if (value is not IInjectable injectable) // Impossible case.
             {
                 throw new JsonWriterException($"[{nameof(InjectionConverter)}.{nameof(WriteJson)}] {nameof(InjectionConverter)} has received {nameof(Type)} for serialization which it can't process. \n{nameof(Type)} - {value?.GetType().Name}");
             }
@@ -39,7 +39,7 @@ namespace DysonCore.DynamicJson.InjectionParser
 
             object instance = Activator.CreateInstance(objectType, true);
 
-            if (instance is not IInjectable injectable) // impossible case.
+            if (instance is not IInjectable injectable) // Impossible case.
             {
                 throw new JsonReaderException($"[{nameof(InjectionConverter)}.{nameof(ReadJson)}] {nameof(InjectionConverter)} has received {nameof(Type)} for deserialization which it can't process. \n{nameof(Type)} - {objectType.Name}");
             }
