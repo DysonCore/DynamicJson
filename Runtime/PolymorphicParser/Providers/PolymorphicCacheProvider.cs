@@ -17,18 +17,10 @@ namespace DysonCore.DynamicJson.PolymorphicParser
                 return _data;
             }
 
-            string directoryPath = Path.Combine(Application.streamingAssetsPath, PolymorphicCacheConstants.CacheDirectoryName);
-            string filePath = Path.Combine(directoryPath, PolymorphicCacheConstants.CacheFileName);
-
-            if (File.Exists(filePath) is false)
-            {
-                throw new FileNotFoundException($"[{nameof(PolymorphicCacheProvider)}.{nameof(GetData)}] Cache file is missing! Report to package developer if occurs.");
-            }
+            string filePath = Path.Combine(PolymorphicCacheConstants.CacheDirectoryName, PolymorphicCacheConstants.FileName);
             
-            using StreamReader reader = new StreamReader(filePath);
-            string jsonData = reader.ReadToEnd();
-            
-            _data = JsonConvert.DeserializeObject<PolymorphicCache>(jsonData, SerializerSettings);
+            TextAsset jsonTextAsset = Resources.Load<TextAsset>(filePath);
+            _data = JsonConvert.DeserializeObject<PolymorphicCache>(jsonTextAsset.text, SerializerSettings);
             
             return _data;
         }
