@@ -131,6 +131,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime
                 Progress = progress;
             }
 
+            [JsonConstructor]
             internal SpecialQuest(){}
         }
         

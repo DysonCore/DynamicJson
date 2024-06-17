@@ -11,7 +11,7 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
     /// Provides a centralized data provider for managing <see cref="PropertyData"/> mappings used by polymorphic converter.
     /// It handles mappings of abstract types and their concrete implementations to facilitate correct type resolution during deserialization.
     /// </summary>
-    internal static class PolymorphicCacheBuilder
+    internal static class CacheBuilder
     {
         /// <summary>
         /// Stores mappings from base types to their corresponding <see cref="TypifyingPropertyData"/>.
@@ -30,7 +30,7 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
         private static readonly Dictionary<Type, List<TypifiedPropertyData>> TypifiedDefiningData = new ();
         
         /// <summary>
-        /// Initializes the <see cref="PolymorphicCacheBuilder"/> with data from the specified assemblies.
+        /// Initializes the <see cref="CacheBuilder"/> with data from the specified assemblies.
         /// Scans the provided assemblies to build the data mappings required for polymorphic deserialization.
         /// </summary>
         internal static PolymorphicCache GetData()
@@ -75,7 +75,7 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
 
             if (isTypifying && isTypified)
             {
-                throw new Exception($"[{nameof(PolymorphicCacheBuilder)}.{nameof(ProcessProperty)}] {classType.Name}.{propertyInfo.Name} property has {nameof(TypifyingPropertyAttribute)} and {nameof(TypifiedPropertyAttribute)} at the same time!");
+                throw new Exception($"[{nameof(CacheBuilder)}.{nameof(ProcessProperty)}] {classType.Name}.{propertyInfo.Name} property has {nameof(TypifyingPropertyAttribute)} and {nameof(TypifiedPropertyAttribute)} at the same time!");
             }
 
             if (isTypifying)
@@ -109,7 +109,7 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
 
             if (baseAttribute == null)
             {
-                throw new Exception($"[{nameof(PolymorphicCacheBuilder)}.{nameof(ProcessTypifyingProperty)}] {baseClass.Name} has no property with {nameof(TypifyingPropertyAttribute)} and \"{propertyInfo.Name}\" {nameof(propertyInfo.Name)}.\nReferencing class - {classType.FullName}.");
+                throw new Exception($"[{nameof(CacheBuilder)}.{nameof(ProcessTypifyingProperty)}] {baseClass.Name} has no property with {nameof(TypifyingPropertyAttribute)} and \"{propertyInfo.Name}\" {nameof(propertyInfo.Name)}.\nReferencing class - {classType.FullName}.");
             }
 
             if (!BaseToPropertyData.TryGetValue(baseClass, out TypifyingPropertyData propertyData)) // Get or create TypifyingPropertyData from / in BaseToPropertyData.
@@ -118,10 +118,10 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
                 BaseToPropertyData[baseClass] = propertyData;
             }
 
-            if (classType.IsAbstract) // If class is abstract - its impossible to create instance of it, so...
+            if (classType.IsAbstract) // If class is abstract - it's impossible to create instance of it, so...
             {
-                if (classType != baseClass) // if current class is abstract class, and current class is not a class which defines current TypifyingProperty -> add this class to the list of abstract classes for post-processing. 
-                {
+                if (classType != baseClass) // if current class is abstract, and does not define TypifyingProperty -
+                {                           // then add this class to the list for post-processing. 
                     AbstractDefiningData.Add((classType, propertyData));
                 }
 
@@ -132,7 +132,7 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
             object classInstance = Activator.CreateInstance(classType, true);
             object propertyValue = propertyInfo.GetValue(classInstance);
 
-            if (propertyValue == null)
+            if (propertyValue == null) //Skip adding value to the list if the value is not defined. 
             {
                 return;
             }

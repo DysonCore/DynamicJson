@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.IO;
-using DysonCore.DynamicJson.SafeStringEnumParser;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -10,29 +8,27 @@ namespace DysonCore.DynamicJson.PolymorphicParser
     {
         private static PolymorphicCache _data;
         
+        private static JsonSerializerSettings SerializerSettings => CacheSerializerSettingsProvider.Settings;
+        
         internal static PolymorphicCache GetData()
         {
-            if (_data != null)
+            if (_data is not null)
             {
                 return _data;
             }
 
-            string filePath = Path.Combine(PolymorphicCacheConstants.CacheDirectoryName, PolymorphicCacheConstants.FileName);
+            string directoryPath = Path.Combine(Application.streamingAssetsPath, PolymorphicCacheConstants.CacheDirectoryName);
+            string filePath = Path.Combine(directoryPath, PolymorphicCacheConstants.CacheFileName);
+
+            if (File.Exists(filePath) is false)
+            {
+                throw new FileNotFoundException($"[{nameof(PolymorphicCacheProvider)}.{nameof(GetData)}] Cache file is missing! Report to package developer if occurs.");
+            }
             
-            List<JsonConverter> converters = new List<JsonConverter>
-            {
-                new TypeConverter(),
-                new SafeStringEnumConverter(),
-                new TypifyingPropertyConverter()
-            };
-
-            JsonSerializerSettings settings = new JsonSerializerSettings
-            {
-                Converters = converters
-            };
-
-            TextAsset jsonTextAsset = Resources.Load<TextAsset>(filePath);
-            _data = JsonConvert.DeserializeObject<PolymorphicCache>(jsonTextAsset.text, settings);
+            using StreamReader reader = new StreamReader(filePath);
+            string jsonData = reader.ReadToEnd();
+            
+            _data = JsonConvert.DeserializeObject<PolymorphicCache>(jsonData, SerializerSettings);
             
             return _data;
         }
