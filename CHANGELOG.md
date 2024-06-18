@@ -2,6 +2,7 @@
 ### injectionConverter added.
 ### Namespaces rework.
 ### UnknownValueHandling moved to PolymorphicConverter
+### PolymorphicConverter works without runtime reflection
 
 ## [1.1.6] - 2024-01-13
 ### SafeStringEnumConverter integrated with PolymorphicConverter.

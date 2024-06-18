@@ -2,7 +2,7 @@
   "name": "com.dysoncore.dynamic-json",
   "version": "2.0.0",
   "displayName": "Dynamic Json",
-  "description": "Extension for Newtonsoft.Json.\n Provides functionalities for better JSON parsing workflow.",
+  "description": "Extension for Newtonsoft.Json.\n Provides functionalities for easier JSON parsing.",
   "unity": "2019.1",
   "unityRelease": "0b5",
   "license": "Check LICENSE.md file",

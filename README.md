@@ -1,8 +1,24 @@
-# _PolymorphicJson_ - An Extension for Newtonsoft.Json
+<span class="animated-text"> 
+<span>D</span>
+<span>y</span>
+<span>n</span>
+<span>a</span>
+<span>m</span>
+<span>i</span>
+<span>c</span>
+<span>J</span>
+<span>s</span>
+<span>o</span>
+<span>n</span>
+<span> </span>
+</span> 
+
+<span class="header-text"> - An Extension for Newtonsoft.Json</span>
+
 
 ![PolymorphicJson logo](https://github.com/DysonCore/PolymorphicJson/assets/39878275/44bc4a94-f9be-44c2-be59-28facebb7a7d)
 
-**PolymorphicJson** is a UPM package that enhances the capabilities of `newtonsoft.json` by providing a straightforward, intuitive, and generalized deserialization flow for complex polymorphism. 
+**DynamicJson** is a **UnityEngine** specific **UPM package** that enhances the capabilities of `newtonsoft.json` by providing a straightforward, intuitive, and generalized deserialization of complex polymorphic models. As well as other tools to simplify workflows with **JSON**s. 
 
 ## Installation 
 To add this package to your Unity project:
@@ -10,21 +26,31 @@ To add this package to your Unity project:
 - _Open_ the **Package Manager**.
 - _press_ the **Add** button.
 - _Select_ `Add package from git URL`.
-- _enter_ the URL: `https://github.com/DysonCore/PolymorphicJson.git`.
+- _enter_ the URL: `https://github.com/DysonCore/DynamicJson.git`.
 
 For a detailed guide, refer to [Unity How to Install a package from a Git URL](https://docs.unity3d.com/Manual/upm-ui-giturl.html)
 
 ### Dependencies
 
-This package requires the **Newtonsoft.Json** library to be installed. 
+This package requires the **Newtonsoft.Json** library to be installed.
 
-If You haven’t already, You can add it as a [UPM package](https://github.com/applejag/Newtonsoft.Json-for-Unity/wiki/Install-official-via-UPM).  
+You can add it as a [UPM package](https://github.com/applejag/Newtonsoft.Json-for-Unity/wiki/Install-official-via-UPM).  
 
+
+<details>
+<summary class="summary-title">
+Polymorphic converter
+<summary class="summary-content">
+//TODO add summary
+
+</summary>
+</summary>
 
 ## Description
 
 - `PolymorphicConverter` - Provides custom JSON deserialization for objects annotated with `TypifyingProperty` attribute.
-- `TypifyingPropertyAttribute` - Designates a property for polymorphic deserialization as a qualifier. This attribute should be applied both on the property declaration and its value assignment. 
+- `TypifyingPropertyAttribute` - Designates a property for polymorphic deserialization as a qualifier. This attribute should be applied both on the property declaration and its value assignment.
+
 
 ## Usage
 
@@ -245,7 +271,16 @@ Specifying assemblies directly can reduce the initialization time and garbage ge
 ## Remarks
 -   Although unit tests are covering the most common use cases, it is never a bad idea to test Your polymorphic models and parsing correctness after initial implementation. 
 
+</details>
 
+<details>
+<summary class="summary-title">
+SafeStringEnum converter
+<summary class="summary-content">
+//TODO add summary
+
+</summary>
+</summary>
 ## SafeStringEnumConverter
 
 `SafeStringEnumConverter` is an inheritor of Newtonsoft `StringEnumConverter` and it is designed to safely handle enum deserialization, providing additional support for default values via a custom `DefaultEnumValueAttribute`.
@@ -278,7 +313,72 @@ Plate plate = JsonConvert.DeserializeObject<Plate>(json);
 
 In this example, an invalid enum value in the JSON string is safely converted to `FoodType.Unknown`.
 
+</details>
 
 ## Feedback and Contributions
 
-Your feedback is invaluable to **PolymorphicJson** improvements. For bug reports, suggestions, feature requests, or contributions, please visit the GitHub repository.
+Your feedback is invaluable to **DynamicJson** improvements. For bug reports, suggestions, feature requests, or contributions, please visit the GitHub repository.
+
+
+<style>
+
+.header-title{
+    font:
+        25px "Open Sans",
+        sans-serif;
+}
+
+.summary-title {
+    font:
+        25px "Open Sans",
+        sans-serif;
+    width: 100%;
+    font-weight: bold;
+    margin-top: 25px;
+}
+
+.summary-content {
+    font:
+        15px "Open Sans",
+        sans-serif;
+    width: 100%;
+    font-weight: normal;
+    margin-top: 15px;
+}
+
+.header-text{
+    font:
+        20px "Open Sans",
+        sans-serif;
+}
+
+.animated-text span {
+    font:
+        20px "Open Sans",
+        sans-serif;
+    font-weight: bold;
+    font-style: italic;
+    display: inline-block;
+    color: #F4F4F4FF;
+    animation: expand-color-change 4s infinite;
+}
+
+@keyframes expand-color-change {
+    0% { opacity: 1; color: #851723; transform: scale(1.5); text-shadow: 0 0 8px #000000FF}
+    20% { opacity: 1; color: #f25147; transform: scale(1.3); text-shadow: 0 0 5px #000000FF}
+    40% { opacity: 1; color: #fab2b2; transform: scale(1.1);  text-shadow: 0 0 2px #000000FF}
+    50% { opacity: 1; color: #F4F4F4FF; transform: scale(1); text-shadow: none  }
+}
+
+.animated-text span:nth-child(1) { animation-delay: 0s; }
+.animated-text span:nth-child(2) { animation-delay: 0.15s; }
+.animated-text span:nth-child(3) { animation-delay: 0.3s; }
+.animated-text span:nth-child(4) { animation-delay: 0.45s; }
+.animated-text span:nth-child(5) { animation-delay: 0.6s; }
+.animated-text span:nth-child(6) { animation-delay: 0.75s; }
+.animated-text span:nth-child(7) { animation-delay: 0.9s; }
+.animated-text span:nth-child(8) { animation-delay: 1.05s; }
+.animated-text span:nth-child(9) { animation-delay: 1.2s; }
+.animated-text span:nth-child(10) { animation-delay: 1.35s; }
+.animated-text span:nth-child(11) { animation-delay: 1.5s; }
+</style>
