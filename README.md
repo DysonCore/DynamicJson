@@ -381,7 +381,7 @@ public class WeaponInjectionDataProvider : InjectionDataProvider<string, WeaponC
 }
 ```
 
-And that it. Really.<br>
+And that is it. Really.<br>
 The only thing left is to plug `InjectionConverter` and test the results. This converter can work both directions (`serialization` and `deserialization`).
 
 ```csharp
