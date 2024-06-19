@@ -17,10 +17,10 @@ For a detailed guide, refer to [Unity How to Install a package from a Git URL](h
 
 ### Dependencies
 
-This package requires the **Newtonsoft.Json** library to be installed.
-
+This package requires the **Newtonsoft.Json** library to be installed.<br>
 You can add it as a [UPM package](https://github.com/applejag/Newtonsoft.Json-for-Unity/wiki/Install-official-via-UPM).  
 
+### Converters
 
 <details>
 <summary class="summary-title">
@@ -252,7 +252,7 @@ With this setup `PolymorphicConverter` will correctly deserialize `IQuestProgres
 
 </details>
 
-<div class="color-wave"></div>
+***
 
 <details>
 <summary class="summary-title">
@@ -295,8 +295,9 @@ Plate plate = JsonConvert.DeserializeObject<Plate>(json);
 
 In this example, an invalid enum value in the JSON string is safely converted to `FoodType.Unknown`.
 
-<div class="closing-arrow"> </div>
 </details>
+
+***
 
 <details>
 <summary class="summary-title">
@@ -420,6 +421,8 @@ List<Weapon> deserializedWeapons = JsonConvert.DeserializeObject<List<Weapon>>(w
 ```
 
 </details>
+
+***
 
 ### Feedback and Contributions
 
