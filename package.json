@@ -1,20 +1,20 @@
 {
-  "name": "com.dysoncore.polymorphic-json",
-  "version": "1.1.6",
-  "displayName": "Polymorphic Json",
-  "description": "Extension for Newtonsoft.Json.\nProvides polymorphic JSON deserialization for objects marked with TypifyingProperty attribute, and other useful tools",
+  "name": "com.dysoncore.dynamic-json",
+  "version": "2.0.0",
+  "displayName": "Dynamic Json",
+  "description": "Extension for Newtonsoft.Json.\n Provides functionalities for easier JSON parsing.",
   "unity": "2019.1",
   "unityRelease": "0b5",
-  "license": "See LICENSE.md file",
+  "license": "Check LICENSE.md file",
   "dependencies": {
     "com.unity.nuget.newtonsoft-json": "2.0.0"
   },
-  "changelogUrl" : "https://github.com/DysonCore/PolymorphicJson/blob/main/CHANGELOG.md",
-  "documentationUrl": "https://github.com/DysonCore/PolymorphicJson/blob/main/README.md",
+  "changelogUrl" : "https://github.com/DysonCore/DynamicJson/blob/main/CHANGELOG.md",
+  "documentationUrl": "https://github.com/DysonCore/DynamicJson/blob/main/README.md",
   "testables": 
-    ["com.dysoncore.polymorphic-json"],
+    ["com.dysoncore.dynamic-json"],
   "keywords": [
-    "Json",
+    "JSON",
     "Parsing",
     "Polymorphism"
   ],
