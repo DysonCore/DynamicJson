@@ -5,8 +5,8 @@ namespace DysonCore.DynamicJson.InjectionParser
     /// <summary>
     /// Provides eager initialization for <see cref="IInjectable"/> models.
     /// </summary>
-    /// <typeparam name="TModel">The type of the model.</typeparam>
-    public sealed class EagerInjectable<TModel> : InjectableBase<TModel>
+    /// <typeparam name="TValue">The type of the model.</typeparam>
+    public sealed class EagerInjectable<TValue> : InjectableBase<TValue>
     {
         /// <summary>
         /// Sets the identifier and immediately resolves the model value.
@@ -17,7 +17,7 @@ namespace DysonCore.DynamicJson.InjectionParser
         }
 
         /// <inheritdoc />
-        public EagerInjectable(TModel value) : base(value)
+        public EagerInjectable(TValue value) : base(value)
         {
             InternalValue = value;
         }
@@ -30,6 +30,6 @@ namespace DysonCore.DynamicJson.InjectionParser
         /// Implicit conversion from EagerInjectable to TModel.
         /// </summary>
         /// <param name="injectable">The EagerInjectable instance.</param>
-        public static implicit operator TModel(EagerInjectable<TModel> injectable) => injectable.Value;
+        public static implicit operator TValue(EagerInjectable<TValue> injectable) => injectable.Value;
     }
 }

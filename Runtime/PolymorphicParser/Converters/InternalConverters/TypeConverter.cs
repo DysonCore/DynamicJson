@@ -16,8 +16,8 @@ namespace DysonCore.DynamicJson.PolymorphicParser
                 return;
             }
             
-            string serializedValue = type.AssemblyQualifiedName;
-            writer.WriteValue(serializedValue);
+            string typeName = type.AssemblyQualifiedName;
+            writer.WriteValue(typeName);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)

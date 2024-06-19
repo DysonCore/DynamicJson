@@ -5,10 +5,10 @@ namespace DysonCore.DynamicJson.InjectionParser
     /// <summary>
     /// Base class for JSON injectable (<see cref="InjectionConverter"/>) models.
     /// </summary>
-    /// <typeparam name="TModel">The type of the model.</typeparam>
-    public abstract class InjectableBase<TModel> : IInjectable<TModel>
+    /// <typeparam name="TValue">The type of the model.</typeparam>
+    public abstract class InjectableBase<TValue> : IInjectable<TValue>
     {
-        protected TModel InternalValue;
+        protected TValue InternalValue;
         
         /// <summary>
         /// Sets the identifier used to resolve the model value.
@@ -19,7 +19,7 @@ namespace DysonCore.DynamicJson.InjectionParser
         /// Virtual property to get and set the model value.
         /// Can be overriden to create different resolving behaviours.
         /// </summary>
-        public virtual TModel Value 
+        public virtual TValue Value 
         { 
             get => InternalValue; 
             protected set => InternalValue = value;
@@ -28,7 +28,7 @@ namespace DysonCore.DynamicJson.InjectionParser
         /// <summary>
         /// Re-route of internal Identifier setter to protected setter.
         /// </summary>
-        object IInjectable<TModel>.Identifier
+        object IInjectable<TValue>.Identifier
         {
             set => Identifier = value;
         }
@@ -37,7 +37,7 @@ namespace DysonCore.DynamicJson.InjectionParser
         /// Initializes a new instance with a given model value.
         /// </summary>
         /// <param name="value">The model value.</param>
-        protected InjectableBase(TModel value)
+        protected InjectableBase(TValue value)
         {
             InternalValue = value;
         }
@@ -53,9 +53,9 @@ namespace DysonCore.DynamicJson.InjectionParser
         /// </summary>
         /// <param name="identifier">The identifier to resolve the value for.</param>
         /// <returns>The resolved model value.</returns>
-        protected static TModel Resolve(object identifier)
+        protected static TValue Resolve(object identifier)
         {
-            return IInjectable<TModel>.Resolve(identifier);
+            return IInjectable<TValue>.Resolve(identifier);
         }
     }
 }

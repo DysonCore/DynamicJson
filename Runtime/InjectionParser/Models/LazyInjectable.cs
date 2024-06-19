@@ -5,15 +5,15 @@ namespace DysonCore.DynamicJson.InjectionParser
     /// <summary>
     /// Provides lazy initialization for <see cref="IInjectable"/> models.
     /// </summary>
-    /// <typeparam name="TModel">The type of the model.</typeparam>
-    public sealed class LazyInjectable<TModel> : InjectableBase<TModel>
+    /// <typeparam name="TValue">The type of the model.</typeparam>
+    public sealed class LazyInjectable<TValue> : InjectableBase<TValue>
     {
         private object _identifier;
 
         /// <summary>
         /// Gets the model value, resolving it lazily if not already set.
         /// </summary>
-        public override TModel Value
+        public override TValue Value
         {
             get => InternalValue ??= Resolve(_identifier);
             protected set => InternalValue = value;
@@ -26,7 +26,7 @@ namespace DysonCore.DynamicJson.InjectionParser
         }
 
         /// <inheritdoc />
-        public LazyInjectable(TModel value)
+        public LazyInjectable(TValue value)
         {
             InternalValue = value;
         }
@@ -39,6 +39,6 @@ namespace DysonCore.DynamicJson.InjectionParser
         /// Implicit conversion from LazyInjectable to TModel.
         /// </summary>
         /// <param name="injectable">The LazyInjectable instance.</param>
-        public static implicit operator TModel(LazyInjectable<TModel> injectable) => injectable.Value;
+        public static implicit operator TValue(LazyInjectable<TValue> injectable) => injectable.Value;
     }
 }
