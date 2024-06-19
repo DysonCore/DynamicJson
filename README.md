@@ -406,7 +406,8 @@ The only thing left is to plug `InjectionConverter` and test the results. This c
 // Create JSON Settings with InjectionConverter.
 var settings = new JsonSerializerSettings();
 settings.Converters.Add(new InjectionConverter());
-// Instantiate data provider. It will be automatically added to the static registry of providers.            
+// Instantiate data provider. It will be automatically added to the static registry of providers. 
+// Also It can be instantiated by Dependency Injector such as Zenject, StrangeIoC, or any other. 
 var weaponDataProvider = new WeaponInjectionDataProvider();
 // Create weapon configs. 
 WeaponConfig heavyBladeConfig = new WeaponConfig("heavy_blade_01", 100);
@@ -432,7 +433,6 @@ string weaponsString = JsonConvert.SerializeObject(weapons, settings);
 // Now we can deserialize it back and InjectionParser will get the WeaponConfig data from 
 // WeaponDataProvider and set it into the Weapon instances. 
 List<Weapon> deserializedWeapons = JsonConvert.DeserializeObject<List<Weapon>>(weaponsString, settings);
-
 ```
 
 </details>
