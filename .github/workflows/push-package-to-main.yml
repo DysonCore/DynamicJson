@@ -53,5 +53,5 @@ jobs:
           # Commit changes
           git commit -m "Update package content from develop branch"
 
-          # Push changes to main branch
-          git push origin main
+          # Force push changes to main branch
+          git push -f origin main
