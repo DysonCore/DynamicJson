@@ -1,4 +1,4 @@
-![PolymorphicJson logo](https://github.com/DysonCore/PolymorphicJson/assets/39878275/44bc4a94-f9be-44c2-be59-28facebb7a7d)
+![DynamicJson logo](https://github.com/DysonCore/PolymorphicJson/assets/39878275/44bc4a94-f9be-44c2-be59-28facebb7a7d)
 
 **DynamicJson** is a **UnityEngine** specific **UPM package** that enhances the capabilities of `newtonsoft.json` by providing a straightforward, intuitive, and generalized deserialization of complex polymorphic models. As well as other tools to simplify workflows with **JSON**s. 
 
@@ -101,7 +101,7 @@ Despite using the `abstract` `Reward` class for deserialization, the `deserializ
 
 ### Complex Inheritance
 
-**PolymorphicJson** is designed to address the challenges posed by intricate inheritance hierarchies in polymorphism.
+**PolymorphicConverter** is designed to address the challenges posed by intricate inheritance hierarchies in polymorphism.
 
 Consider the scenario of an `abstract` `Animal` class. This base class has an `abstract` inheritor `Mammal`, which in turn can be inherited by other concrete classes like `Dog` or `Cat`.
 ```csharp
@@ -146,17 +146,17 @@ In this example:
 -	`Mammal`, an `abstract` derived class, assigns the value `"Mammal"` to the `AnimalType` and introduces its own qualifier `MammalType`.
 -	Concrete classes `Dog` and `Cat` further override `MammalType` qualifier to provide specific values.
 
-When deserializing a list of `Animal`, **PolymorphicJson** will inspect the qualifiers and correctly instantiate `Dog` and `Cat` objects based on the provided JSON, even with such nested hierarchies.
+When deserializing a list of `Animal`, **PolymorphicConverter** will inspect the qualifiers and correctly instantiate `Dog` and `Cat` objects based on the provided JSON, even with such nested hierarchies.
 
 ### Typifying types
 
-**PolymorphicJson** allows a great deal of flexibility when choosing the type for typifying property. Both `value types` and `reference types` which properly implement equality comparison are valid. I.e. `override bool Equals(object obj)` and `override int GetHashCode()`.
+**PolymorphicConverter** allows a great deal of flexibility when choosing the type for typifying property. Both `value types` and `reference types` which properly implement equality comparison are valid. I.e. `override bool Equals(object obj)` and `override int GetHashCode()`.
 
-**\*Tip\*:** the most concise and convenient type for qualifying property is `enum` in combination with `Newtonsoft.StringEnumConverter` or `PolymorphicJson.SafeStringEnumConverter`. 
+**\*Tip\*:** the most concise and convenient type for qualifying property is `enum` in combination with `Newtonsoft.StringEnumConverter` or `DynamicJson.SafeStringEnumConverter`. 
 
 ### Interface as Inheritance Root 
 
-**PolymorphicJson** can't automatically find references between interface and derived classes. So if You are using interface as an inheritance root, You need to explicitly specify the interface type like so:
+**PolymorphicConverter** can't automatically find references between interface and derived classes. So if You are using interface as an inheritance root, You need to explicitly specify the interface type like so:
 
 ```csharp
 public interface IAnimal
