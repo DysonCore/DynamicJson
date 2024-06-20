@@ -19,7 +19,7 @@ jobs:
           mkdir package-directory
           
           # Copy the contents of the package to the temporary directory
-          cp -R Packages/com.dysoncore.dynamic-json/
+          cp -R Packages/com.dysoncore.dynamic-json/* package-directory/
 
       - name: Commit and push to main
         run: |
@@ -53,5 +53,5 @@ jobs:
           # Commit changes
           git commit -m "Update package content from develop branch"
 
-          # Force push changes to main branch
+          # Force pushe changes to main branch
           git push -f origin main
