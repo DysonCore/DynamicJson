@@ -1,4 +1,4 @@
-![DynamicJson logo](https://github.com/DysonCore/PolymorphicJson/assets/39878275/44bc4a94-f9be-44c2-be59-28facebb7a7d)
+![DynamicJsonLogo](https://github.com/DysonCore/DynamicJson/assets/39878275/a10bc4b3-1a78-415c-a4f2-d70493b6982d)
 
 **DynamicJson** is a **UnityEngine** specific **UPM package** that enhances the capabilities of `newtonsoft.json` by providing a straightforward, intuitive, and generalized deserialization of complex polymorphic models. As well as other tools to simplify workflows with **JSON**s. 
 
