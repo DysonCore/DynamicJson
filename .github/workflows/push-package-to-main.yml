@@ -1,0 +1,57 @@
+name: Push DynamicJson package to Main
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sync-package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          ref: develop
+
+      - name: Copy package directory
+        run: |
+          # Create a temporary directory for the package
+          mkdir package-directory
+          
+          # Copy the contents of the package to the temporary directory
+          cp -R Packages/com.dysoncore.dynamic-json/
+
+      - name: Commit and push to main
+        run: |
+          # Change to the package directory
+          cd package-directory
+          
+          # Initialize a new Git repository
+          git init
+
+          # Configure Git user
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+          # Add remote repository
+          git remote add origin https://github.com/DysonCore/DynamicJson.git
+
+          # Fetch the latest main branch
+          git fetch origin main
+
+          # Checkout to main branch or create it if it doesn't exist
+          if git rev-parse --verify origin/main >/dev/null 2>&1; then
+            git checkout main
+            git reset --hard origin/main
+          else
+            git checkout --orphan main
+          fi
+
+          # Add all files to Git
+          git add .
+
+          # Commit changes
+          git commit -m "Update package content from develop branch"
+
+          # Push changes to main branch
+          git push origin main
