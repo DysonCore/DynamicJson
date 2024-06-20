@@ -60,6 +60,7 @@ sysinfo.txt
 *.aab
 *.unitypackage
 *.app
+*.csproj.DotSettings
 
 # Crashlytics generated file
 crashlytics-build.properties
