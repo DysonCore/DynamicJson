@@ -39,10 +39,9 @@ jobs:
           # Fetch the latest main branch
           git fetch origin main
 
-          # Checkout to main branch or create it if it doesn't exist
+          # Force checkout to main branch or create it if it doesn't exist
           if git rev-parse --verify origin/main >/dev/null 2>&1; then
-            git checkout main
-            git reset --hard origin/main
+            git checkout -B main
           else
             git checkout --orphan main
           fi
