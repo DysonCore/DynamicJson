@@ -24,6 +24,9 @@ jobs:
           # Copy the .github/workflows directory to the temporary directory
           mkdir -p package-directory/.github/workflows
           cp -R .github/workflows/* package-directory/.github/workflows/
+          
+          # Copy the .gitignore file to the temporary directory
+          cp .gitignore package-directory/
 
       - name: Commit and push to main
         env:
