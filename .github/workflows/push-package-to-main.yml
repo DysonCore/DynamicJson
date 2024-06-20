@@ -21,6 +21,10 @@ jobs:
           # Copy the contents of the package to the temporary directory
           cp -R Packages/com.dysoncore.dynamic-json/* package-directory/
 
+          # Copy the .github/workflows directory to the temporary directory
+          mkdir -p package-directory/.github/workflows
+          cp -R .github/workflows/* package-directory/.github/workflows/
+
       - name: Commit and push to main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
