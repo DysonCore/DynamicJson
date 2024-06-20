@@ -1,4 +1,4 @@
-name: Push DynamicJson package to Main
+ name: Sync Package to Main
 
 on:
   workflow_dispatch:
@@ -22,6 +22,8 @@ jobs:
           cp -R Packages/com.dysoncore.dynamic-json/* package-directory/
 
       - name: Commit and push to main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Change to the package directory
           cd package-directory
@@ -52,5 +54,5 @@ jobs:
           # Commit changes
           git commit -m "Update package content from develop branch"
 
-          # Force pushe changes to main branch
-          git push -f origin main
+          # Push changes to main branch using token authentication
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/DysonCore/DynamicJson.git main
