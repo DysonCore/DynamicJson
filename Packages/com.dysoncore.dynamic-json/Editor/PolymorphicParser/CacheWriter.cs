@@ -27,7 +27,6 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
             using JsonTextWriter jsonWriter = new JsonTextWriter(writer);
             JsonSerializer serializer = JsonSerializer.Create(SerializerSettings);
             
-            Debug.Log(fileGlobalPath);
             serializer.Serialize(jsonWriter, cacheData);
             AssetDatabase.ImportAsset(fileInProjectPath);
         }
