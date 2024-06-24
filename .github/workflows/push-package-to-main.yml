@@ -61,5 +61,5 @@ jobs:
           # Commit changes
           git commit -m "Update package content from develop branch"
 
-          # Force push changes to main branch using token authentication
-          git push -f https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/DysonCore/DynamicJson.git main
+          # Push changes to main branch using token authentication
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/DysonCore/DynamicJson.git main
