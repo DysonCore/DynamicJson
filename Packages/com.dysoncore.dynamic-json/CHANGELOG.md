@@ -1,3 +1,7 @@
+## [2.0.1] - 2024-07-27
+### Fixed test runner not showing 
+
+
 ## [2.0.0] - 2024-02-13
 ### injectionConverter added.
 ### Namespaces rework.
