@@ -9,10 +9,11 @@
   "dependencies": {
     "com.unity.nuget.newtonsoft-json": "2.0.0"
   },
-  "changelogUrl" : "https://github.com/DysonCore/DynamicJson/blob/main/CHANGELOG.md",
+  "changelogUrl": "https://github.com/DysonCore/DynamicJson/blob/main/CHANGELOG.md",
   "documentationUrl": "https://github.com/DysonCore/DynamicJson/blob/main/README.md",
-  "testables": 
-    ["com.dysoncore.dynamic-json"],
+  "testables": [
+    "com.dysoncore.dynamic-json"
+  ],
   "keywords": [
     "JSON",
     "Parsing",
