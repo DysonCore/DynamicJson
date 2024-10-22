@@ -1,0 +1,21 @@
+{
+    "name": "DysonCore.DynamicJson.Tests.Runtime",
+    "rootNamespace": "DysonCore.DynamicJson.Tests.Runtime",
+    "references": [
+        "GUID:bfb88d74f3df44cbd8b3745ce3d52e33"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Newtonsoft.Json.dll",
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
