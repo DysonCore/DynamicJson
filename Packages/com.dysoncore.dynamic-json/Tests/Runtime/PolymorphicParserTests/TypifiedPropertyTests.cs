@@ -100,6 +100,36 @@ namespace DysonCore.DynamicJson.Tests.Runtime
             }
         }
         
+        [Test]
+        public void DeserializeTypifiedWithInterface_CompletesSuccessfully()
+        {
+            TequilaDescription tequilaDescription = new TequilaDescription("throat burner");
+            RumDescription rumDescription = new RumDescription("pure sand", "refreshing as Sahara desert");
+            
+            HardDrink tequila = new HardDrink("tequila", tequilaDescription);
+            HardDrink rum = new HardDrink("rum", rumDescription);
+            
+            List<HardDrink> drinks = new List<HardDrink>
+            {
+                tequila,
+                rum
+            };
+            
+            string drinksList = JsonConvert.SerializeObject(drinks, _settings);
+            List<HardDrink> deserializedDrinksList = JsonConvert.DeserializeObject<List<HardDrink>>(drinksList, _settings);
+            
+            Assert.IsNotNull(deserializedDrinksList);
+            Assert.AreEqual(drinks.Count, deserializedDrinksList.Count);
+            
+            for (int i = 0; i < deserializedDrinksList.Count; i++)
+            {
+                Assert.IsNotNull(deserializedDrinksList[i]);
+                Assert.IsNotNull(deserializedDrinksList[i].Type);
+                Assert.IsInstanceOf(drinks[i].GetType(),  deserializedDrinksList[i]);
+                Assert.IsInstanceOf(drinks[i].Description.GetType(),  deserializedDrinksList[i].Description);
+            }
+        }
+        
         
 #region TestModel_Quests
 
@@ -214,6 +244,100 @@ namespace DysonCore.DynamicJson.Tests.Runtime
             public override string Type => "normalRewardData";
         }
     
+#endregion
+
+#region TestModel_Drinks
+
+        private interface IDrink
+        {
+            public string Type { get; }
+
+            public DrinkDescription Description { get; }
+        }
+
+        private class SoftDrink : IDrink
+        {
+            [JsonProperty]
+            public string Type { get; }
+
+            [JsonProperty] 
+            public bool IsChilled { get; private set; }
+            
+            [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+            public DrinkDescription Description { get; }
+
+            private SoftDrink() { }
+
+            public SoftDrink(bool isChilled = true)
+            {
+                IsChilled = isChilled;
+            }
+        }
+
+        private class HardDrink : IDrink
+        {
+            [JsonProperty]
+            [TypifyingProperty]
+            public string Type { get; }
+
+            [JsonProperty]
+            [TypifiedProperty]
+            public DrinkDescription Description { get; private set; }
+            
+            private HardDrink() { }
+
+            public HardDrink(string type, DrinkDescription description)
+            {
+                Type = type;
+                Description = description;
+            }
+
+        }
+
+        private abstract class DrinkDescription
+        {
+            [JsonProperty]
+            [TypifyingProperty] 
+            public abstract string Type { get; }
+
+            [JsonProperty] 
+            public string Name { get; protected set; }
+
+            protected DrinkDescription()
+            {
+            }
+
+            protected DrinkDescription(string name)
+            {
+                Name = name;
+            }
+        }
+
+        private class TequilaDescription : DrinkDescription
+        {
+            [TypifyingProperty]
+            public override string Type => "tequila";
+
+            private TequilaDescription() { }
+
+            public TequilaDescription(string name) : base(name) { }
+        }
+        
+        private class RumDescription : DrinkDescription
+        {
+            [TypifyingProperty] 
+            public override string Type => "rum";
+
+            public string Description { get; private set; }
+
+            private RumDescription() { }
+
+            public RumDescription(string name, string description) : base(name)
+            {
+                Description = description;
+            }
+        }
+
 #endregion
     }
 }
