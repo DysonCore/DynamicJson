@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace DysonCore.DynamicJson
+namespace DysonCore.DynamicJson.Utils
 {
     internal static class CollectionUtils
     {

@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace DysonCore.DynamicJson
+namespace DysonCore.DynamicJson.Utils
 {
     /// <summary>
     /// Provides internal <see cref="Type"/> utility methods.

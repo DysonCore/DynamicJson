@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using DysonCore.DynamicJson.CodeGeneration;
 
-namespace DysonCore.DynamicJson
+namespace DysonCore.DynamicJson.Utils
 {
     /// <summary>
     /// Provides internal <see cref="Assembly"/> utility methods.

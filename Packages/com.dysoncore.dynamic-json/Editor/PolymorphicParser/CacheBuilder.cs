@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using DysonCore.DynamicJson.PolymorphicParser;
+using DysonCore.DynamicJson.Utils;
 using Newtonsoft.Json;
 
 namespace DysonCore.DynamicJson.Editor.PolymorphicParser
