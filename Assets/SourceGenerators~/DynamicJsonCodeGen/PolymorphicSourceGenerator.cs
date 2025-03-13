@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace DysonCore.DynamicJson.SourceGenerators
 {
-    [Generator]
+    /*[Generator]
     public class PolymorphicSourceGenerator : ISourceGenerator
     {
         public void Initialize(GeneratorInitializationContext context)
@@ -16,12 +16,8 @@ namespace DysonCore.DynamicJson.SourceGenerators
 
         public void Execute(GeneratorExecutionContext context)
         {
-            System.Diagnostics.Debugger.Launch();
-
-            if (context.Compilation.AssemblyName != "DysonCore.DynamicJson.Runtime")
-            {
-                return;
-            }
+            
+            SendDiagnostics($"Assembly - {context.Compilation.AssemblyName}", context);
             
             // var desc = new DiagnosticDescriptor("id", "title", $"[{nameof(PolymorphicSourceGenerator)}] assembly - {context.Compilation.AssemblyName}", "category", DiagnosticSeverity.Error, true);
             // var diag = Diagnostic.Create(desc, Location.None, "random shit");
@@ -46,7 +42,7 @@ namespace DysonCore.DynamicJson.SourceGenerators
             codeWriter.WriteLine("{");
             codeWriter.Indent++;
             
-            codeWriter.WriteLine("return \"Hello, Polymorphic Bitch!\";");
+            codeWriter.WriteLine("return \"Hello, Polymorphic Piece of SHIT!!\";");
             
             codeWriter.Indent--;
             codeWriter.WriteLine("}");
@@ -62,5 +58,13 @@ namespace DysonCore.DynamicJson.SourceGenerators
             context.AddSource("PolymorphicCacheTest.g.cs", SourceText.From(stream, Encoding.UTF8, canBeEmbedded: true));
             
         }
-    }
+        
+        private static void SendDiagnostics(string message, GeneratorExecutionContext context)
+        {
+            var desc = new DiagnosticDescriptor("id", "title", $"[{nameof(PolymorphicSourceGenerator)}] {message}",
+                "category", DiagnosticSeverity.Error, true);
+            var diag = Diagnostic.Create(desc, Location.None, "random shit");
+            context.ReportDiagnostic(diag);
+        }
+    }*/
 }

@@ -1,5 +1,5 @@
 #nullable enable
-using System;
+
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,53 +7,53 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace DysonCore.DynamicJson.SourceGenerators
+namespace ggg
 {
     [Generator]
     public class SafeStringEnumSourceGenerator : ISourceGenerator
     {
-
+        private const string TargetAssemblyName = "DysonCore.DynamicJson.Runtime";
+        
         public void Initialize(GeneratorInitializationContext context)
         {
-            //System.Diagnostics.Debugger.Launch(); // Uncomment to debug
+            System.Diagnostics.Debugger.Launch(); // Uncomment to debug
             context.RegisterForSyntaxNotifications(() => new EnumSyntaxReceiver());
         }
 
         public void Execute(GeneratorExecutionContext context)
         {
-            return;
-            if (context.Compilation.AssemblyName != "DysonCore.DynamicJson.Runtime")
-            {
-                return;
-            }
+            bool isReferenced = context.Compilation.ReferencedAssemblyNames
+                .Select(identity => identity.Name == TargetAssemblyName)
+                .Any();
+
             
-            // var desc = new DiagnosticDescriptor("id", "title", $"[{nameof(SafeStringEnumSourceGenerator)}] assembly - {context.Compilation.AssemblyName}", "category", DiagnosticSeverity.Error, true);
-            // var diag = Diagnostic.Create(desc, Location.None, "random shit");
-            // context.ReportDiagnostic(diag);
+            if (!isReferenced || context.Compilation.AssemblyName == TargetAssemblyName)
+            {
+               return;
+            }
             
             if (context.SyntaxReceiver is not EnumSyntaxReceiver receiver)
             {
                 return;
             }
-                
 
             Compilation compilation = context.Compilation;
-            INamedTypeSymbol? enumAttribute = compilation.GetTypeByMetadataName("DefaultEnumValueAttribute");
-            
+            INamedTypeSymbol? enumAttribute = compilation.GetTypeByMetadataName("DysonCore.DynamicJson.SafeStringEnumParser.DefaultEnumValueAttribute");
+
             if (enumAttribute == null)
             {
-                // No attribute defined; nothing to generate.
+                //SendDiagnostics($"No Enum attribute in assembly - {context.Compilation.AssemblyName}", context);
                 return;
             }
 
             // List of mapping entries.
-            List<EnumMappingEntry> entries = new ();
+            List<EnumMappingEntry> entries = new();
 
             // Process each candidate enum declaration.
             foreach (EnumDeclarationSyntax enumDeclaration in receiver.CandidateEnums)
             {
                 SemanticModel model = compilation.GetSemanticModel(enumDeclaration.SyntaxTree);
-                
+
                 if (model.GetDeclaredSymbol(enumDeclaration) is not INamedTypeSymbol enumSymbol)
                 {
                     continue;
@@ -61,17 +61,18 @@ namespace DysonCore.DynamicJson.SourceGenerators
 
                 // Check each enum member for the attribute.
                 string? markedMemberName = null;
-                
+
                 foreach (var member in enumDeclaration.Members)
                 {
                     ISymbol? memberSymbol = model.GetDeclaredSymbol(member);
-                    
+
                     if (memberSymbol == null)
                     {
                         continue;
                     }
-                    
-                    if (Enumerable.Any(memberSymbol.GetAttributes(), attributeData => SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, enumAttribute)))
+
+                    if (Enumerable.Any(memberSymbol.GetAttributes(),
+                            attributeData => SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, enumAttribute)))
                     {
                         markedMemberName = member.Identifier.Text;
                     }
@@ -86,13 +87,20 @@ namespace DysonCore.DynamicJson.SourceGenerators
                 {
                     continue;
                 }
-                
-                bool isPublic = enumSymbol.DeclaredAccessibility == Accessibility.Public;
+
+                bool isPrivate = enumSymbol.DeclaredAccessibility is Accessibility.Private;
+                bool isNested = enumSymbol.ContainingType != null;
                 string fqName = enumSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 
-                if (!fqName.StartsWith("global::"))
+                
+
+                if (isNested)
                 {
-                    fqName = "global::" + fqName;
+                    int lastDot = fqName.LastIndexOf('.');
+                    if (lastDot >= 0)
+                    {
+                        fqName = $"{fqName.Substring(0, lastDot)}+{fqName.Substring(lastDot + 1)}";
+                    } 
                 }
 
                 string assemblyName = enumSymbol.ContainingAssembly.Name;
@@ -101,7 +109,7 @@ namespace DysonCore.DynamicJson.SourceGenerators
                 {
                     EnumTypeName = fqName,
                     MarkedMember = markedMemberName,
-                    IsPublic = isPublic,
+                    IsPrivate = isPrivate,
                     AssemblyName = assemblyName
                 });
             }
@@ -113,59 +121,77 @@ namespace DysonCore.DynamicJson.SourceGenerators
             sb.AppendLine("// </auto-generated>");
             sb.AppendLine("using System;");
             sb.AppendLine("using System.Collections.Generic;");
-            sb.AppendLine("namespace DysonCore.DynamicJson.CodeGeneration");
+            sb.AppendLine("using DysonCore.DynamicJson.SafeStringEnumParser;");
+            sb.AppendLine("using UnityEngine;");
+            sb.AppendLine("#if UNITY_EDITOR");
+            sb.AppendLine("using UnityEditor;");
+            sb.AppendLine("#endif");
+            sb.AppendLine($"namespace DysonCore.DynamicJson.CodeGeneration");
             sb.AppendLine("{");
-            sb.AppendLine("    internal static class DefaultEnumValueCache");
+            sb.AppendLine("    public static class DefaultEnumValueCache");
             sb.AppendLine("    {");
-            sb.AppendLine(
-                "        internal static readonly Dictionary<Type, object> Cache = new Dictionary<Type, object>()");
+            sb.AppendLine("        private static readonly Dictionary<Type, object> Cache = new Dictionary<Type, object>()");
             sb.AppendLine("        {");
-
-            // For each entry, generate a dictionary entry.
+            // Generate a dictionary entry for each mapping.
             foreach (var entry in entries)
             {
-                if (entry.IsPublic)
+                if (entry.IsPrivate)
                 {
-                    // Use compile-time typeof and direct enum member access.
-                    sb.AppendLine(
-                        $"            {{ typeof({entry.EnumTypeName}), {entry.EnumTypeName}.{entry.MarkedMember} }},");
+                    // For internal (or private) enums, use runtime resolution.
+                    // Build an assembly-qualified name.
+                    string name = entry.EnumTypeName;
+                    if (name.Contains("global::"))
+                    {
+                        name = name.Remove(0, 8);
+                    }
+                    
+                    string aqn = $"{name}, {entry.AssemblyName}";
+                    //SendDiagnostics($"{aqn}", context);
+                    sb.AppendLine("            {");
+                    sb.AppendLine($"                Type.GetType(\"{Escape(aqn)}\"),");
+                    sb.AppendLine($"                Enum.Parse(Type.GetType(\"{Escape(aqn)}\"), \"{entry.MarkedMember}\")");
+                    sb.AppendLine("            },");
                 }
                 else
                 {
-                    // For internal enums, use runtime resolution.
-                    // We'll use Type.GetType with the assembly-qualified name.
-                    string aqn = $"{entry.EnumTypeName}, {entry.AssemblyName}";
-                    sb.AppendLine("            {");
-                    sb.AppendLine($"                Type.GetType(\"{Escape(aqn)}\"),");
-                    sb.AppendLine("                 Enum.Parse(Type.GetType(\"" + Escape(aqn) + "\"), \"" + entry.MarkedMember + "\")");
-                    sb.AppendLine("            },");
+                    // For public enums, use compile-time typeof and direct member access.
+                    string name = entry.EnumTypeName.StartsWith("global::")
+                        ? entry.EnumTypeName
+                        : $"global::{entry.EnumTypeName}";
+
+                    sb.AppendLine($"            {{ typeof({name}), {name}.{entry.MarkedMember} }},");
                 }
             }
 
             sb.AppendLine("        };");
+            //TODO Change this bullshit to [ModuleInitializer] Attribute after Unity adopts full c# 9 
+            // to not force assemblies to reference UnityEngine and UnityEditor
+            sb.AppendLine("#if UNITY_EDITOR");
+            sb.AppendLine("        [InitializeOnLoadMethod]");
+            sb.AppendLine("#endif");
+            sb.AppendLine("        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]");
+            sb.AppendLine("        private static void Initialize()");
+            sb.AppendLine("        {");
+            sb.AppendLine($"             SafeStringEnumCacheRegistry.Register(\"{compilation.AssemblyName}\", Cache);");
+            sb.AppendLine("        }");
             sb.AppendLine("    }");
             sb.AppendLine("}");
 
-            Console.WriteLine(sb);
             context.AddSource("DefaultEnumValueCache.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
-        }
-
-        private static string Escape(string input)
-        {
-            return input.Replace("\\", "\\\\").Replace("\"", "\\\"");
         }
 
         private struct EnumMappingEntry
         {
             public string EnumTypeName; // Fully qualified name (with global::)
             public string MarkedMember; // The enum member name marked with [DefaultEnumValue]
-            public bool IsPublic; // True if the enum is public, false if internal
+            public bool IsPrivate; // True if the enum is private, false if internal or public
             public string AssemblyName; // The assembly name where the enum is defined
+
         }
 
         private class EnumSyntaxReceiver : ISyntaxReceiver
         {
-            public List<EnumDeclarationSyntax> CandidateEnums { get; } = new ();
+            public List<EnumDeclarationSyntax> CandidateEnums { get; } = new();
 
             public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
             {
@@ -173,13 +199,26 @@ namespace DysonCore.DynamicJson.SourceGenerators
                 {
                     return;
                 }
-                
+
                 // Look for enum declarations that have at least one attribute on one of their members.
                 if (enumDeclaration.Members.Any(member => member.AttributeLists.Count > 0))
                 {
                     CandidateEnums.Add(enumDeclaration);
                 }
             }
+        }
+        
+        private static string Escape(string input)
+        {
+            return input.Replace("\\", "\\\\").Replace("\"", "\\\"");
+        }
+
+        private static void SendDiagnostics(string message, GeneratorExecutionContext context)
+        {
+            var desc = new DiagnosticDescriptor("id", "title", $"[{nameof(SafeStringEnumSourceGenerator)}] {message}",
+                "category", DiagnosticSeverity.Error, true);
+            var diag = Diagnostic.Create(desc, Location.None, "random shit");
+            context.ReportDiagnostic(diag);
         }
     }
 }
