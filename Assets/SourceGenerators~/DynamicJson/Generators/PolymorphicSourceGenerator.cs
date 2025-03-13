@@ -16,13 +16,6 @@ namespace DysonCore.DynamicJson.SourceGenerators
 
         public void Execute(GeneratorExecutionContext context)
         {
-            
-            SendDiagnostics($"Assembly - {context.Compilation.AssemblyName}", context);
-            
-            // var desc = new DiagnosticDescriptor("id", "title", $"[{nameof(PolymorphicSourceGenerator)}] assembly - {context.Compilation.AssemblyName}", "category", DiagnosticSeverity.Error, true);
-            // var diag = Diagnostic.Create(desc, Location.None, "random shit");
-            // context.ReportDiagnostic(diag);
-            
             MemoryStream stream = new MemoryStream();
             StreamWriter writer = new StreamWriter(stream, Encoding.UTF8);
             IndentedTextWriter codeWriter = new IndentedTextWriter(writer);
