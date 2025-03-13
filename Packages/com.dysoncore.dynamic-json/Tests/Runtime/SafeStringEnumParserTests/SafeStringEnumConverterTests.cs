@@ -160,6 +160,7 @@ namespace DysonCore.DynamicJson.Tests.Runtime
                 Assert.IsInstanceOf(plates[i].GetType(), deserializedPlates[i]);
                 Assert.AreEqual(plates[i].FoodType, deserializedPlates[i].FoodType);
             }
+            
         }
         
         [Test]

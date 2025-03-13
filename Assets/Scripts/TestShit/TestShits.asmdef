@@ -1,0 +1,16 @@
+{
+    "name": "TestShits",
+    "rootNamespace": "",
+    "references": [
+        "GUID:bfb88d74f3df44cbd8b3745ce3d52e33"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,6 +1,5 @@
+using System;
 using UnityEditor;
-using UnityEngine;
-using DysonCore.DynamicJson.CodeGeneration;
 
 namespace DysonCore.DynamicJson.Editor.PolymorphicParser
 {
@@ -22,8 +21,7 @@ namespace DysonCore.DynamicJson.Editor.PolymorphicParser
 
         private static void Test()
         {
-            Debug.Log($"{PolymorphicCacheTest.GetTestText()}");
-            //var cahce = DefaultEnumValueCache.Cache;
+
         }
     }
 }

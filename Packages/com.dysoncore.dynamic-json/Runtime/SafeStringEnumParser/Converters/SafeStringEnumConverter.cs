@@ -1,6 +1,5 @@
 using System;
-using System.Collections.Concurrent;
-using System.Reflection;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -9,7 +8,7 @@ namespace DysonCore.DynamicJson.SafeStringEnumParser
 {
     public sealed class SafeStringEnumConverter : StringEnumConverter
     {
-        private static readonly ConcurrentDictionary<Type, object> DefaultsMap = new ();
+        private static IReadOnlyDictionary<Type, object> DefaultsMap => SafeStringEnumCacheRegistry.DefaultsMap;
         
         /// <summary>
         /// Initializes a new instance of the <see cref="SafeStringEnumConverter"/> class.
@@ -57,44 +56,16 @@ namespace DysonCore.DynamicJson.SafeStringEnumParser
             }
             catch (Exception)
             {
-                object defaultValue = GetDefaultValue(objectType);
+                Type actualType = Nullable.GetUnderlyingType(objectType) ?? objectType; //is used to support nullable enums
                 
-                if (defaultValue != null)
+                if(DefaultsMap.TryGetValue(actualType, out object value)) 
                 {
-                    return defaultValue;
+                    return value;
                 }
 
                 throw;
             }
         }
-
-        /// <summary>
-        /// Gets the default value of the enum type specified using <see cref="DefaultEnumValueAttribute"/>.
-        /// </summary>
-        /// <param name="type">Type of the enum.</param>
-        /// <returns>The default enum value, or null if none is found.</returns>
-        private object GetDefaultValue(Type type)
-        {
-            Type actualType = Nullable.GetUnderlyingType(type) ?? type; //is used to support nullable enums
-
-            if(DefaultsMap.TryGetValue(actualType, out object value)) //check cache for resolved defaults 
-            {
-                return value;
-            }
-            
-            foreach (FieldInfo field in actualType.GetFields())
-            {
-                if (field.GetCustomAttribute<DefaultEnumValueAttribute>() == null)
-                {
-                    continue;
-                }
-                
-                value = Enum.Parse(actualType, field.Name);
-                DefaultsMap[actualType] = value;
-                break;
-            }
-            
-            return value;
-        }
+        
     }
 }
