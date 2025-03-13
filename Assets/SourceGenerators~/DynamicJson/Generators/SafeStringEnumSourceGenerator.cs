@@ -38,8 +38,7 @@ namespace DysonCore.DynamicJson.SourceGenerators
             }
 
             Compilation compilation = context.Compilation;
-            INamedTypeSymbol? targetAttribute =
-                compilation.GetTypeByMetadataName(SafeStringEnumConstants.TargetAttributeName);
+            INamedTypeSymbol? targetAttribute = compilation.GetTypeByMetadataName(SafeStringEnumConstants.TargetAttributeName);
 
             if (targetAttribute == null)
             {
@@ -63,8 +62,7 @@ namespace DysonCore.DynamicJson.SourceGenerators
                 {
                     ISymbol? memberSymbol = model.GetDeclaredSymbol(member);
 
-                    if (memberSymbol == null || !memberSymbol.GetAttributes().Any(attributeData =>
-                            SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, targetAttribute)))
+                    if (memberSymbol == null || !memberSymbol.GetAttributes().Any(attributeData => SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, targetAttribute)))
                     {
                         continue;
                     }
