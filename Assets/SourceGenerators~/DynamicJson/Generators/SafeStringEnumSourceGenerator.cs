@@ -123,8 +123,8 @@ namespace DysonCore.DynamicJson.SourceGenerators
             writer.WriteLine("{");
             writer.Indent++;
             writer.WriteLine($"SafeStringEnumCacheRegistry.Register(\"{context.Compilation.AssemblyName}\", GetCache());");
-            writer.WriteLine("}");
             writer.Indent--;
+            writer.WriteLine("}");
             writer.WriteLine();
 
             writer.WriteLine("private static Dictionary<Type, object> GetCache()");
