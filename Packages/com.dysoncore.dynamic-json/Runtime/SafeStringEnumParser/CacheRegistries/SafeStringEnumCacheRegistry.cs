@@ -16,6 +16,7 @@ namespace DysonCore.DynamicJson.SafeStringEnumParser
         {
             FragmentedCache[fragment] = cache;
             _cacheChanged = true;
+            
         }
         
         private static ConcurrentDictionary<Type, object> GetCache()

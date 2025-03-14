@@ -47,10 +47,12 @@ namespace DysonCore.DynamicJson.SourceGenerators
 
             // List of enums to generate.
             List<EnumEntry> entries = new();
+            List<EnumEntry> temporaryEntries = new();
 
             // Process each candidate enum declaration.
             foreach (EnumDeclarationSyntax enumDeclaration in receiver.CandidateEnums)
             {
+                temporaryEntries.Clear();
                 SemanticModel model = compilation.GetSemanticModel(enumDeclaration.SyntaxTree);
 
                 if (model.GetDeclaredSymbol(enumDeclaration) is not INamedTypeSymbol enumSymbol)
@@ -62,14 +64,22 @@ namespace DysonCore.DynamicJson.SourceGenerators
                 {
                     ISymbol? memberSymbol = model.GetDeclaredSymbol(member);
 
-                    if (memberSymbol == null || !memberSymbol.GetAttributes().Any(attributeData => SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, targetAttribute)))
+                    if (memberSymbol == null 
+                        || !memberSymbol.GetAttributes().Any(attributeData => SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, targetAttribute)))
                     {
                         continue;
                     }
-
-                    entries.Add(new EnumEntry(enumSymbol, member.Identifier.Text));
-                    break;
+                    
+                    temporaryEntries.Add(new EnumEntry(enumSymbol, member.Identifier.Text));
                 }
+
+                if (temporaryEntries.Count >= 2)
+                {
+                    DiagnosticUtils.SendDiagnostics(new DiagnosticDescriptor("SourceGenerator", "Source Generation Error", $"\n[{nameof(SafeStringEnumSourceGenerator)}.{nameof(Execute)}] - {enumSymbol.ToDisplayString()} has more that 1 [{targetAttribute.Name}]. Remove redundant attributes.\n", "category", DiagnosticSeverity.Error, true), context);
+                    return;
+                }
+                
+                entries.AddRange(temporaryEntries);
             }
 
             if (entries.Count <= 0)
